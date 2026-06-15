@@ -1,0 +1,26 @@
+consulta,ranking,documento,similitud
+inteligencia artificial aprendizaje,1,Doc 3,0.462910
+inteligencia artificial aprendizaje,2,Doc 1,0.387298
+inteligencia artificial aprendizaje,3,Doc 11,0.272166
+inteligencia artificial aprendizaje,4,Doc 12,0.000000
+inteligencia artificial aprendizaje,5,Doc 9,0.000000
+seguridad informática redes protección,1,Doc 4,0.166667
+seguridad informática redes protección,2,Doc 2,0.166667
+seguridad informática redes protección,3,Doc 1,0.158114
+seguridad informática redes protección,4,Doc 12,0.000000
+seguridad informática redes protección,5,Doc 9,0.000000
+programación software desarrollo,1,Doc 9,0.298142
+programación software desarrollo,2,Doc 7,0.298142
+programación software desarrollo,3,Doc 5,0.154303
+programación software desarrollo,4,Doc 12,0.000000
+programación software desarrollo,5,Doc 10,0.000000
+datos bases consultas información,1,Doc 8,0.559017
+datos bases consultas información,2,Doc 6,0.250000
+datos bases consultas información,3,Doc 4,0.235702
+datos bases consultas información,4,Doc 10,0.125000
+datos bases consultas información,5,Doc 2,0.117851
+robots autónomos ingeniería,1,Doc 12,0.342997
+robots autónomos ingeniería,2,Doc 11,0.000000
+robots autónomos ingeniería,3,Doc 10,0.000000
+robots autónomos ingeniería,4,Doc 9,0.000000
+robots autónomos ingeniería,5,Doc 8,0.000000

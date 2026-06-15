@@ -8,14 +8,22 @@ Eres responsable de tomar los textos en su estado bruto (raw), limpiarlos y tran
 
 ## Tareas de Código (`src/`)
 
-- [ ] **`src/preprocesamiento.py`**:
-  - [ ] Implementar función para cargar textos desde la carpeta `data/`.
-  - [ ] Implementar función `limpiar_texto(texto: str)` que pase todo a minúsculas, elimine signos de puntuación y caracteres especiales.
-  - [ ] Implementar tokenización básica (separar oraciones en palabras) y, si es posible, remoción de *stopwords* (palabras comunes sin significado como "el", "la", "de").
-- [ ] **`src/vectorizacion.py`**:
-  - [ ] Implementar función `construir_vocabulario(corpus: list)` que extraiga todas las palabras únicas de todos los documentos y les asigne un índice.
-  - [ ] Implementar la función `crear_matriz_documento_termino(corpus: list, vocabulario: dict)` que genere una representación matemática (vectores) donde las filas son documentos, las columnas son términos del vocabulario y los valores son las frecuencias (o conteo) de aparición.
-  - [ ] Retornar la matriz en un formato apto para operaciones matemáticas (ej. `numpy.array` o matrices esparsas de `scipy`).
+> ⚠️ **Avance de Renato (Persona 3) — 14/06/2026:**
+> Para poder probar sus visualizaciones con datos reales, Renato implementó una **versión base/plantilla** de tus dos módulos. El código ya está funcional y probado, pero **debes revisarlo, entenderlo y personalizarlo** (ajustar comentarios, estilo, quizás cambiar implementaciones) para que puedas defenderlo como propio en la presentación. Los archivos afectados son:
+> - `src/preprocesamiento.py` — Funciones `cargar_documentos()`, `limpiar_texto()`, `tokenizar()`, `remover_stopwords()` y `preprocesar_corpus()`.
+> - `src/vectorizacion.py` — Funciones `construir_vocabulario()`, `crear_matriz_documento_termino()` y `obtener_vocabulario_inverso()`.
+> - `data/documentos/corpus.txt` — Corpus de 12 documentos sobre tecnología/computación.
+
+- [ ] **`src/preprocesamiento.py`**: *(plantilla base ya implementada — revisar y personalizar)*
+  - [x] Implementar función para cargar textos desde la carpeta `data/`. *(base lista)*
+  - [x] Implementar función `limpiar_texto(texto: str)` que pase todo a minúsculas, elimine signos de puntuación y caracteres especiales. *(base lista)*
+  - [x] Implementar tokenización básica (separar oraciones en palabras) y, si es posible, remoción de *stopwords* (palabras comunes sin significado como "el", "la", "de"). *(base lista)*
+  - [ ] **→ Revisar, entender y personalizar el código para poder defenderlo.**
+- [ ] **`src/vectorizacion.py`**: *(plantilla base ya implementada — revisar y personalizar)*
+  - [x] Implementar función `construir_vocabulario(corpus: list)` que extraiga todas las palabras únicas de todos los documentos y les asigne un índice. *(base lista)*
+  - [x] Implementar la función `crear_matriz_documento_termino(corpus: list, vocabulario: dict)` que genere una representación matemática (vectores) donde las filas son documentos, las columnas son términos del vocabulario y los valores son las frecuencias (o conteo) de aparición. *(base lista)*
+  - [x] Retornar la matriz en un formato apto para operaciones matemáticas (ej. `numpy.array` o matrices esparsas de `scipy`). *(base lista)*
+  - [ ] **→ Revisar, entender y personalizar el código para poder defenderlo.**
 
 ## Tareas del Informe (`informe/`)
 

@@ -10,9 +10,14 @@ Eres el ancla que une todas las piezas. Asegurarás que el código fluya sin err
 
 ## Tareas de Código (`src/` y general)
 
-- [ ] **`src/main.py`**:
-  - [ ] Programar el cascarón/menú de la aplicación usando *mock functions*.
-  - [ ] Integrar la cadena real: leer datos -> vectorizar -> buscador -> consultas -> resultados.
+> ⚠️ **Avance de Renato (Persona 3) — 14/06/2026:**
+> Para integrar el pipeline completo durante sus pruebas de visualización, Renato implementó una **versión base/plantilla** de `main.py` con menú interactivo y modo demo (`--demo`). **Debes revisarlo, entenderlo y personalizarlo** para que puedas defenderlo como propio.
+> - `src/main.py` — Menú interactivo con opciones: buscar, generar gráficos, ver vocabulario, ver matriz, exportar CSV. Incluye modo `--demo` con 5 consultas automáticas.
+
+- [ ] **`src/main.py`**: *(plantilla base ya implementada — revisar y personalizar)*
+  - [x] Programar el cascarón/menú de la aplicación usando *mock functions*. *(base lista — funcional con datos reales)*
+  - [x] Integrar la cadena real: leer datos -> vectorizar -> buscador -> consultas -> resultados. *(base lista)*
+  - [ ] **→ Revisar, entender y personalizar el código para poder defenderlo.**
 - [ ] **Documentación y Originalidad Algorítmica (Evitar sospecha de IA)**:
   - [ ] Asegurarte que todas las funciones en todos los scripts tengan *docstrings* y comentarios.
   - [ ] **CRÍTICO:** La rúbrica anula proyectos por copia directa de IA. Para el "Anexo V: Código documentado", asegúrate de evidenciar trabajo humano original, documentando detalladamente **por qué se tomaron decisiones algorítmicas** en el código (ej. "usamos `numpy.dot` aquí porque optimiza el tiempo frente a un bucle for tradicional").

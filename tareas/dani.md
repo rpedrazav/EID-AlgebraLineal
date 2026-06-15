@@ -12,14 +12,21 @@ Con estos datos de prueba, puedes programar todo tu código (`similitud.py` y `b
 
 ## Tareas de Código (`src/`)
 
-- [ ] **`src/similitud.py`**:
-  - [ ] Implementar la función `calcular_producto_punto(u, v)` desde cero o usando `numpy.dot`.
-  - [ ] Implementar la función `calcular_norma(vector)` (magnitud del vector).
-  - [ ] Implementar la función principal `similitud_coseno(u, v)` aplicando estrictamente la fórmula: $cos(\theta) = \frac{u \cdot v}{||u|| ||v||}$.
-- [ ] **`src/buscador.py`**:
-  - [ ] Implementar la clase o funciones del buscador (`BuscadorSemantico`).
-  - [ ] Crear la lógica para calcular la similitud coseno de una consulta (vector) contra **cada fila** de una matriz (matriz de documentos).
-  - [ ] Retornar los índices de los documentos ordenados (ranking) de mayor a menor similitud.
+> ⚠️ **Avance de Renato (Persona 3) — 14/06/2026:**
+> Para poder probar sus visualizaciones con datos reales, Renato implementó una **versión base/plantilla** de tus dos módulos. El código ya está funcional y probado, pero **debes revisarlo, entenderlo y personalizarlo** (ajustar comentarios, estilo, quizás cambiar implementaciones) para que puedas defenderlo como propio en la presentación. Los archivos afectados son:
+> - `src/similitud.py` — Funciones `calcular_producto_punto()`, `calcular_norma()` y `similitud_coseno()`.
+> - `src/buscador.py` — Clase `BuscadorSemantico` con métodos `vectorizar_consulta()`, `buscar()` y `calcular_matriz_similitud()`.
+
+- [ ] **`src/similitud.py`**: *(plantilla base ya implementada — revisar y personalizar)*
+  - [x] Implementar la función `calcular_producto_punto(u, v)` desde cero o usando `numpy.dot`. *(base lista)*
+  - [x] Implementar la función `calcular_norma(vector)` (magnitud del vector). *(base lista)*
+  - [x] Implementar la función principal `similitud_coseno(u, v)` aplicando estrictamente la fórmula: $cos(\theta) = \frac{u \cdot v}{||u|| ||v||}$. *(base lista)*
+  - [ ] **→ Revisar, entender y personalizar el código para poder defenderlo.**
+- [ ] **`src/buscador.py`**: *(plantilla base ya implementada — revisar y personalizar)*
+  - [x] Implementar la clase o funciones del buscador (`BuscadorSemantico`). *(base lista)*
+  - [x] Crear la lógica para calcular la similitud coseno de una consulta (vector) contra **cada fila** de una matriz (matriz de documentos). *(base lista)*
+  - [x] Retornar los índices de los documentos ordenados (ranking) de mayor a menor similitud. *(base lista)*
+  - [ ] **→ Revisar, entender y personalizar el código para poder defenderlo.**
 
 ## Tareas del Informe (`informe/`)
 

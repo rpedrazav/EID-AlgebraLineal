@@ -1,0 +1,12 @@
+La inteligencia artificial es una rama de la informática que busca crear sistemas capaces de realizar tareas que normalmente requieren inteligencia humana como el reconocimiento de voz y la toma de decisiones.
+Las redes neuronales artificiales son modelos computacionales inspirados en el funcionamiento del cerebro humano que permiten a las máquinas aprender patrones complejos a partir de grandes cantidades de datos.
+El aprendizaje automático es un subcampo de la inteligencia artificial que permite a los sistemas mejorar su rendimiento en una tarea específica mediante la experiencia sin ser programados explícitamente.
+La ciberseguridad se enfoca en proteger los sistemas informáticos redes y datos contra ataques maliciosos accesos no autorizados y daños garantizando la confidencialidad integridad y disponibilidad de la información.
+Los sistemas operativos son el software fundamental que gestiona los recursos del hardware y proporciona servicios esenciales para la ejecución de programas y aplicaciones de usuario.
+La computación en la nube permite acceder a recursos informáticos como servidores almacenamiento y bases de datos a través de internet sin necesidad de infraestructura física propia.
+El desarrollo de software implica un proceso estructurado que incluye el análisis de requisitos diseño implementación pruebas y mantenimiento de programas y aplicaciones informáticas.
+Las bases de datos relacionales organizan la información en tablas con filas y columnas permitiendo realizar consultas eficientes mediante el lenguaje SQL para gestionar grandes volúmenes de datos.
+La programación orientada a objetos es un paradigma que organiza el código en clases y objetos facilitando la reutilización modularidad y mantenimiento del software.
+Los algoritmos de búsqueda y ordenamiento son fundamentales en la ciencia de la computación ya que permiten encontrar y organizar datos de manera eficiente optimizando el uso de recursos del sistema.
+El procesamiento del lenguaje natural es un campo de la inteligencia artificial que permite a las computadoras comprender interpretar y generar texto en lenguaje humano de forma automática.
+La robótica combina ingeniería mecánica electrónica y ciencias de la computación para diseñar construir y programar robots capaces de realizar tareas de forma autónoma o semiautónoma.
