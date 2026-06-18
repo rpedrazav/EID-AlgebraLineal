@@ -1,27 +1,6 @@
 """
 Módulo de Visualización y Análisis Experimental
 =================================================
-Responsable: Persona 3 (Renato)
-
-Este módulo genera las representaciones gráficas del buscador semántico:
-- Heatmap de similitud coseno entre documentos (matplotlib + seaborn)
-- Reducción dimensional con PCA (sklearn.decomposition.PCA) + scatter plot
-- Gráfico de frecuencia de términos (barras)
-- Gráfico de resultados de búsqueda (barras horizontales)
-
-Bibliotecas utilizadas y justificación:
-- matplotlib: biblioteca estándar de visualización en Python. Se eligió
-  por su control total sobre cada aspecto del gráfico (ejes, colores,
-  anotaciones) y su amplia documentación.
-- seaborn: capa sobre matplotlib que simplifica la creación de heatmaps
-  con anotaciones y paletas de color profesionales. Reduce ~20 líneas
-  de configuración manual a una sola llamada.
-- sklearn.decomposition.PCA: implementación eficiente de Análisis de
-  Componentes Principales. PCA reduce la dimensionalidad de los vectores
-  (de n dimensiones a 2) preservando la máxima varianza posible,
-  permitiendo visualizar las relaciones entre documentos en un plano 2D.
-  Internamente usa SVD (Descomposición en Valores Singulares), otro
-  concepto fundamental de álgebra lineal.
 """
 
 import os
@@ -47,27 +26,7 @@ def _asegurar_directorio():
 
 def plot_matriz_similitud(matriz_similitudes, etiquetas=None,
                           guardar=True, mostrar=False):
-    """
-    Genera un mapa de calor (heatmap) de la matriz de similitud coseno.
-
-    Cada celda (i, j) muestra qué tan similares son los documentos i y j.
-    Colores cálidos = alta similitud, colores fríos = baja similitud.
-
-    Parámetros
-    ----------
-    matriz_similitudes : numpy.ndarray
-        Matriz cuadrada (m x m) de similitudes coseno.
-    etiquetas : list[str], opcional
-        Nombres de los documentos para los ejes.
-    guardar : bool
-        Si True, guarda la imagen en graficos/.
-    mostrar : bool
-        Si True, muestra el gráfico en pantalla.
-
-    Retorna
-    -------
-    str — Ruta del archivo guardado (o None si no se guardó).
-    """
+    """Genera un mapa de calor (heatmap) de la matriz de similitud coseno."""
     _asegurar_directorio()
 
     n = len(matriz_similitudes)
@@ -76,9 +35,7 @@ def plot_matriz_similitud(matriz_similitudes, etiquetas=None,
 
     fig, ax = plt.subplots(figsize=(10, 8))
 
-    # Heatmap con seaborn: paleta "YlOrRd" (amarillo-naranja-rojo)
-    # annot=True muestra los valores numéricos en cada celda
-    # fmt=".2f" formatea a 2 decimales
+    # Heatmap con seaborn
     sns.heatmap(
         matriz_similitudes,
         annot=True,
@@ -121,36 +78,7 @@ def plot_matriz_similitud(matriz_similitudes, etiquetas=None,
 def plot_pca_documentos(matriz_doc_termino, etiquetas=None,
                         consulta_vector=None, consulta_texto=None,
                         guardar=True, mostrar=False):
-    """
-    Reduce los vectores de documentos a 2D con PCA y crea un scatter plot.
-
-    PCA (Análisis de Componentes Principales) busca las 2 direcciones
-    de máxima varianza en el espacio n-dimensional y proyecta los
-    datos sobre ellas. Esto permite visualizar la "cercanía" entre
-    documentos en un plano cartesiano interpretable.
-
-    Internamente, PCA usa SVD: X = UΣVᵀ, y selecciona las primeras
-    2 columnas de la proyección.
-
-    Parámetros
-    ----------
-    matriz_doc_termino : numpy.ndarray
-        Matriz (m x n) de documentos vectorizados.
-    etiquetas : list[str], opcional
-        Nombres de los documentos.
-    consulta_vector : numpy.ndarray, opcional
-        Vector de una consulta para incluir en el gráfico.
-    consulta_texto : str, opcional
-        Texto de la consulta para la leyenda.
-    guardar : bool
-        Si True, guarda en graficos/.
-    mostrar : bool
-        Si True, muestra en pantalla.
-
-    Retorna
-    -------
-    str — Ruta del archivo guardado.
-    """
+    """Reduce los vectores de documentos a 2D con PCA y crea un scatter plot."""
     _asegurar_directorio()
 
     n_docs = len(matriz_doc_termino)
@@ -239,27 +167,7 @@ def plot_pca_documentos(matriz_doc_termino, etiquetas=None,
 
 def plot_frecuencia_terminos(matriz_doc_termino, vocabulario,
                              top_n=15, guardar=True, mostrar=False):
-    """
-    Genera un gráfico de barras con los términos más frecuentes del corpus.
-
-    Suma las frecuencias de cada término a lo largo de todos los documentos
-    (suma por columnas de la Matriz Documento-Término).
-
-    Parámetros
-    ----------
-    matriz_doc_termino : numpy.ndarray
-        Matriz (m x n) documento-término.
-    vocabulario : dict
-        Diccionario {palabra: índice}.
-    top_n : int
-        Cantidad de términos más frecuentes a mostrar.
-    guardar, mostrar : bool
-        Control de salida.
-
-    Retorna
-    -------
-    str — Ruta del archivo guardado.
-    """
+    """Genera un gráfico de barras con los términos más frecuentes del corpus."""
     _asegurar_directorio()
 
     # Sumar frecuencias por columna (total de cada término en el corpus)
@@ -319,24 +227,7 @@ def plot_frecuencia_terminos(matriz_doc_termino, vocabulario,
 
 def plot_resultados_busqueda(resultados, consulta, guardar=True,
                              mostrar=False, nombre_archivo=None):
-    """
-    Gráfico de barras horizontal con las similitudes de una búsqueda.
-
-    Parámetros
-    ----------
-    resultados : list[dict]
-        Salida de BuscadorSemantico.buscar().
-    consulta : str
-        Texto de la consulta realizada.
-    guardar, mostrar : bool
-        Control de salida.
-    nombre_archivo : str, opcional
-        Nombre del archivo PNG (sin extensión).
-
-    Retorna
-    -------
-    str — Ruta del archivo guardado.
-    """
+    """Genera un gráfico de barras horizontal con las similitudes de una búsqueda."""
     _asegurar_directorio()
 
     etiquetas = [r["etiqueta"] for r in resultados]

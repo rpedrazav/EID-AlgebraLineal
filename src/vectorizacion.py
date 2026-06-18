@@ -1,27 +1,12 @@
 """
 Módulo de Vectorización de Texto
 =================================
-Autor: Sebastián (Persona 1)
-
-En esta etapa, tomamos los textos ya preprocesados y los convertimos a números.
-Esto es clave en Álgebra Lineal: pasamos de palabras a un espacio vectorial
-donde cada documento es un vector y el vocabulario nos da las dimensiones.
-
-Decisiones:
-- Utilizo diccionarios para el vocabulario por su velocidad de búsqueda (O(1)).
-- La Matriz Documento-Término la construyo con numpy.array para poder
-  aprovechar luego las operaciones algebraicas nativas, ya que es mucho más
-  rápido y eficiente en Python.
 """
 
 import numpy as np
 
 def construir_vocabulario(corpus_procesado):
-    """
-    Genera un diccionario que mapea cada palabra única a un índice numérico.
-    Este índice definirá qué columna de nuestra matriz le corresponde
-    a dicha palabra. Se ordena alfabéticamente para mantener consistencia.
-    """
+    """Genera un diccionario que mapea cada palabra única a un índice numérico."""
     terminos_unicos = set()
     
     # Recorrer todos los documentos y guardar palabras sin repetir
@@ -38,11 +23,7 @@ def construir_vocabulario(corpus_procesado):
     return vocabulario_ordenado
 
 def crear_matriz_documento_termino(corpus_procesado, vocabulario):
-    """
-    Crea la Matriz Documento-Término.
-    Cada fila es un documento, cada columna una palabra del vocabulario.
-    El valor en (i, j) es cuántas veces aparece la palabra j en el doc i.
-    """
+    """Crea la Matriz Documento-Término."""
     filas = len(corpus_procesado)
     columnas = len(vocabulario)
     
@@ -59,9 +40,6 @@ def crear_matriz_documento_termino(corpus_procesado, vocabulario):
     return matriz_dt
 
 def obtener_vocabulario_inverso(vocabulario):
-    """
-    Devuelve un diccionario invertido (índice -> palabra).
-    Sirve para poder leer la matriz luego y saber qué significa cada columna.
-    """
+    """Devuelve un diccionario invertido (índice -> palabra)."""
     vocabulario_inv = {idx: palabra for palabra, idx in vocabulario.items()}
     return vocabulario_inv

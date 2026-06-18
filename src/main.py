@@ -1,55 +1,8 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Programa Principal — Buscador Semántico Simple
 ================================================
-Responsable: Rodrigo (Persona 4 — Integración y Project Manager)
-Curso: Álgebra Lineal para la Computación
-
-Descripción general
--------------------
-Este archivo es el punto de entrada único del proyecto. Su función es
-ensamblar todas las piezas desarrolladas por el equipo en un pipeline
-coherente y ejecutable:
-
-    Corpus de texto
-        └─► Preprocesamiento  (src/preprocesamiento.py)
-                └─► Vectorización   (src/vectorizacion.py)
-                        └─► Similitud Coseno (src/similitud.py)
-                                └─► Buscador      (src/buscador.py)
-                                        └─► Visualización (src/visualizacion.py)
-
-Formas de ejecución
--------------------
-Desde la RAÍZ del proyecto (carpeta EID-AlgebraLineal/):
-
-    Modo interactivo (menú de terminal):
-        python -m src.main
-
-    Modo demo automático (sin interacción del usuario):
-        python -m src.main --demo
-
-Decisiones de diseño tomadas en este archivo
---------------------------------------------
-1. Usamos `python -m src.main` en lugar de ejecutar `src/main.py` directamente,
-   porque el flag -m garantiza que Python añade el directorio raíz al sys.path
-   automáticamente. Así, los imports del estilo `from src.preprocesamiento import ...`
-   funcionan correctamente sin manipular PYTHONPATH desde el sistema operativo.
-
-2. El modo --demo existe para que los gráficos y resultados CSV puedan generarse
-   con un solo comando, sin que el evaluador tenga que interactuar manualmente.
-   Es clave para reproducibilidad: cualquier persona puede clonar el repo y
-   ejecutar `python -m src.main --demo` para obtener todos los resultados.
-
-3. El pipeline se inicializa UNA SOLA VEZ (función inicializar_pipeline) y los
-   objetos resultantes se reutilizan en el menú. Si vectorizáramos en cada
-   búsqueda, el tiempo por consulta escalaría con el tamaño del corpus.
-   Al vectorizar una sola vez y guardar la matriz en RAM, las búsquedas son
-   O(m·n) donde m=documentos y n=vocabulario, que es muy eficiente.
-
-4. La exportación a CSV se hace con el módulo estándar `csv` en lugar de pandas
-   porque el volumen de datos es pequeño y así se elimina una dependencia pesada
-   para una tarea simple de escritura secuencial.
+Punto de entrada único del proyecto. Ensambla todas las piezas
+desarrolladas por el equipo en un pipeline coherente y ejecutable.
 """
 
 import os
@@ -61,22 +14,12 @@ import numpy as np
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-# ---------------------------------------------------------------------------
 # Configuración del sys.path
-# ---------------------------------------------------------------------------
-# Necesitamos que el directorio raíz del proyecto esté en sys.path para que
-# los imports de `src.*` funcionen independientemente de desde dónde se
-# ejecute el script.
-# os.path.abspath(__file__) → ruta absoluta de main.py
-# os.path.dirname(...)      → carpeta src/
-# os.path.dirname(...)      → carpeta raíz del proyecto
 directorio_raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if directorio_raiz not in sys.path:
     sys.path.insert(0, directorio_raiz)
 
-# ---------------------------------------------------------------------------
 # Importaciones de los módulos del proyecto
-# ---------------------------------------------------------------------------
 from src.preprocesamiento import cargar_documentos, preprocesar_corpus
 from src.vectorizacion import (
     construir_vocabulario,
@@ -91,12 +34,7 @@ from src.visualizacion import (
 )
 
 
-# ---------------------------------------------------------------------------
 # Constantes de rutas
-# ---------------------------------------------------------------------------
-# Definimos las rutas como constantes globales para que sean fáciles de
-# modificar si el usuario cambia la estructura de carpetas. Es mejor práctica
-# que tener las rutas "hardcodeadas" dentro de cada función.
 RUTA_CORPUS = os.path.join(
     directorio_raiz, "data", "documentos", "corpus.txt"
 )
@@ -109,34 +47,7 @@ RUTA_RESULTADOS = os.path.join(
 # FUNCIÓN: inicializar_pipeline
 # ===========================================================================
 def inicializar_pipeline():
-    """
-    Ejecuta el pipeline completo de preparación de datos del buscador.
-
-    Etapas del pipeline
-    -------------------
-    1. Carga de documentos desde el corpus (archivo .txt).
-    2. Preprocesamiento: limpieza, tokenización y remoción de stopwords.
-    3. Vectorización: construcción del vocabulario y la Matriz Documento-Término.
-    4. Inicialización del motor de búsqueda (BuscadorSemantico).
-
-    Decisión de diseño — sparsidad
-    --------------------------------
-    Calculamos y mostramos la sparsidad de la matriz como indicador de
-    eficiencia. La sparsidad es el porcentaje de celdas con valor 0.
-    En un modelo Bag-of-Words, valores de 80-95% de sparsidad son normales:
-    cada documento usa solo una fracción del vocabulario total. Esto valida
-    que nuestra implementación es realista.
-
-    Retorna
-    -------
-    tuple
-        (buscador, vocabulario, matriz, documentos, etiquetas)
-        - buscador    : instancia de BuscadorSemantico lista para consultas
-        - vocabulario : dict {palabra: índice}
-        - matriz      : numpy.ndarray (m x n) Matriz Documento-Término
-        - documentos  : list[str] textos originales
-        - etiquetas   : list[str] nombres cortos para cada documento
-    """
+    """Ejecuta el pipeline completo de preparación de datos del buscador."""
     print("=" * 62)
     print("  BUSCADOR SEMANTICO SIMPLE")
     print("  Algebra Lineal para la Computacion - Grupo 2")
@@ -217,30 +128,7 @@ def inicializar_pipeline():
 # FUNCIÓN: generar_graficos
 # ===========================================================================
 def generar_graficos(buscador, vocabulario, matriz, etiquetas):
-    """
-    Genera los tres gráficos base del análisis experimental.
-
-    Gráficos producidos
-    -------------------
-    1. Heatmap de similitud coseno entre todos los documentos.
-       → Permite identificar visualmente clústeres temáticos.
-    2. Scatter plot PCA: documentos reducidos a 2 dimensiones.
-       → Permite ver la distribución geométrica del corpus.
-    3. Barras: top-15 términos más frecuentes del corpus.
-       → Valida que el preprocesamiento eliminó correctamente las stopwords.
-
-    Parámetros
-    ----------
-    buscador   : BuscadorSemantico — motor de búsqueda inicializado.
-    vocabulario : dict             — mapeo {palabra: índice}.
-    matriz     : numpy.ndarray     — Matriz Documento-Término (m × n).
-    etiquetas  : list[str]         — nombres de los documentos.
-
-    Retorna
-    -------
-    numpy.ndarray
-        Matriz de similitudes coseno (m × m), útil para análisis posteriores.
-    """
+    """Genera los tres gráficos base del análisis experimental."""
     print("--- Generando graficos base ---")
 
     # calcular_matriz_similitud() computa cos(θ) entre cada par de documentos.
@@ -265,30 +153,7 @@ def generar_graficos(buscador, vocabulario, matriz, etiquetas):
 # FUNCIÓN: realizar_busqueda
 # ===========================================================================
 def realizar_busqueda(buscador, consulta, top_n=5):
-    """
-    Ejecuta una consulta en el buscador semántico y muestra los resultados.
-
-    Proceso interno (dentro de BuscadorSemantico.buscar)
-    -----------------------------------------------------
-    1. La consulta pasa por el mismo preprocesamiento que los documentos.
-    2. Se convierte en un vector usando el vocabulario existente.
-       (Palabras de la consulta que no están en el vocabulario se ignoran.)
-    3. Se calcula similitud coseno entre el vector consulta y cada fila de
-       la Matriz Documento-Término.
-    4. Los documentos se ordenan de mayor a menor similitud.
-    5. Se retornan los top_n primeros.
-
-    Parámetros
-    ----------
-    buscador : BuscadorSemantico — motor de búsqueda.
-    consulta : str               — texto ingresado por el usuario.
-    top_n    : int               — número máximo de resultados (default: 5).
-
-    Retorna
-    -------
-    list[dict]
-        Lista de resultados con claves: 'etiqueta', 'similitud', 'documento'.
-    """
+    """Ejecuta una consulta en el buscador semántico y muestra los resultados."""
     print(f"\n  Consulta: \"{consulta}\"")
     print("  " + "-" * 55)
 
@@ -315,30 +180,7 @@ def realizar_busqueda(buscador, consulta, top_n=5):
 # FUNCIÓN: exportar_resultados_csv
 # ===========================================================================
 def exportar_resultados_csv(todas_busquedas, ruta=None):
-    """
-    Exporta el historial de búsquedas a un archivo CSV.
-
-    Formato del CSV
-    ---------------
-    columnas: consulta | ranking | documento | similitud
-
-    Decisión de diseño — módulo csv vs pandas
-    ------------------------------------------
-    Usamos el módulo estándar `csv` en lugar de pandas.DataFrame.to_csv()
-    porque:
-    - El volumen de datos es pequeño (máx. ~100 filas por sesión).
-    - `csv` no requiere instalar pandas, reduciendo dependencias.
-    - El código es transparente: se ve exactamente qué se escribe y cómo.
-    pandas sería preferible si necesitáramos transformar o filtrar datos antes
-    de exportar.
-
-    Parámetros
-    ----------
-    todas_busquedas : list[tuple]
-        Lista de tuplas (consulta: str, resultados: list[dict]).
-    ruta : str, opcional
-        Ruta de destino. Si es None, usa RUTA_RESULTADOS.
-    """
+    """Exporta el historial de búsquedas a un archivo CSV."""
     ruta = ruta or RUTA_RESULTADOS
 
     # exist_ok=True evita error si la carpeta ya existe.
@@ -365,33 +207,7 @@ def exportar_resultados_csv(todas_busquedas, ruta=None):
 # FUNCIÓN: menu_interactivo
 # ===========================================================================
 def menu_interactivo(buscador, vocabulario, matriz, etiquetas):
-    """
-    Muestra un menú de terminal en bucle para interactuar con el buscador.
-
-    Opciones del menú
-    -----------------
-    1. Realizar búsqueda → ingresa una consulta y ver los documentos más similares.
-    2. Generar todos los gráficos → heatmap, PCA y frecuencia de términos.
-    3. Ver vocabulario → lista completa de términos indexados.
-    4. Ver matriz documento-término → imprime la matriz numérica.
-    5. Exportar resultados a CSV → guarda el historial de búsquedas.
-    0. Salir → exporta automáticamente y termina.
-
-    Decisión de diseño — menú en terminal vs. interfaz gráfica
-    ------------------------------------------------------------
-    Se eligió un menú de texto (stdin/stdout) porque:
-    - No requiere bibliotecas adicionales (tkinter, PyQt, etc.).
-    - Funciona en cualquier entorno: Windows, Linux, macOS, SSH remoto.
-    - Es suficiente para una demo académica donde el foco está en el
-      algoritmo, no en la UI.
-
-    Parámetros
-    ----------
-    buscador    : BuscadorSemantico — motor de búsqueda.
-    vocabulario : dict              — mapeo {palabra: índice}.
-    matriz      : numpy.ndarray     — Matriz Documento-Término (m × n).
-    etiquetas   : list[str]         — nombres de los documentos.
-    """
+    """Muestra un menú de terminal en bucle para interactuar con el buscador."""
     # Acumulamos todas las búsquedas para poder exportarlas en bloque al final.
     todas_busquedas = []
 
@@ -477,32 +293,7 @@ def menu_interactivo(buscador, vocabulario, matriz, etiquetas):
 # FUNCIÓN: ejecutar_demo
 # ===========================================================================
 def ejecutar_demo():
-    """
-    Ejecuta una demostración automática con consultas predefinidas.
-
-    Propósito
-    ---------
-    Permite reproducir todos los resultados del proyecto con un solo comando,
-    sin intervención manual. Útil para:
-    - Que el profesor verifique el funcionamiento del sistema.
-    - Generar automáticamente todos los gráficos e ilustraciones del informe.
-    - Comprobar que el entorno está configurado correctamente.
-
-    Consultas de demostración
-    -------------------------
-    Las 5 consultas cubren los temas principales del corpus para demostrar
-    que el buscador recupera documentos temáticamente relevantes:
-    1. "inteligencia artificial aprendizaje" → espera recuperar docs 1, 2, 3, 11
-    2. "seguridad informática redes protección" → espera doc 4
-    3. "programación software desarrollo" → espera docs 7, 9
-    4. "datos bases consultas información" → espera docs 6, 8
-    5. "robots autónomos ingeniería" → espera doc 12
-
-    Decisión de diseño — 5 consultas
-    ---------------------------------
-    Se eligieron 5 porque cubren los 5 clústeres temáticos del corpus sin
-    redundancia, permitiendo un análisis comparativo representativo.
-    """
+    """Ejecuta una demostración automática con consultas predefinidas."""
     # Inicializar el pipeline completo
     buscador, vocabulario, matriz, documentos, etiquetas = \
         inicializar_pipeline()
@@ -561,20 +352,7 @@ def ejecutar_demo():
 # PUNTO DE ENTRADA
 # ===========================================================================
 if __name__ == "__main__":
-    """
-    Punto de entrada del programa.
-
-    Lógica de selección de modo
-    ---------------------------
-    - Si se pasa el argumento --demo en la línea de comandos:
-        → Ejecuta la demo automática (no interactiva).
-    - En cualquier otro caso:
-        → Inicializa el pipeline y lanza el menú interactivo.
-
-    Usamos sys.argv (lista de argumentos de línea de comandos) en lugar de
-    argparse porque la lógica de argumentos es simple (un solo flag booleano).
-    argparse sería preferible si hubiera múltiples opciones con valores.
-    """
+    """Punto de entrada del programa."""
     if "--demo" in sys.argv:
         ejecutar_demo()
     else:
