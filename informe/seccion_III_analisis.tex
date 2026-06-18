@@ -1,0 +1,207 @@
+% =============================================================================
+% Sección III — Análisis Experimental y Visualización
+% Responsable: Renato (Persona 3)
+% =============================================================================
+% NOTA: Esta sección se incluye en el documento principal con \input{seccion_III_analisis}
+% La subsección III.A.1 (Álgebra Lineal y operaciones vectoriales) la redacta Dani (Persona 2).
+% Renato se encarga del análisis empírico: III.A.2 en adelante y toda la sección III.B.
+% =============================================================================
+
+% ─────────────────────────────────────────────────────────────────────────────
+% III.A.2 — Búsquedas experimentales y análisis de resultados
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Búsquedas experimentales y análisis de resultados}
+
+Para evaluar empíricamente el funcionamiento del buscador semántico, se diseñaron cinco consultas que cubren los principales ejes temáticos del corpus. El objetivo es determinar si el sistema, basado únicamente en frecuencia de términos y similitud coseno, es capaz de recuperar documentos semánticamente relevantes.
+
+\subsubsection{Diseño experimental}
+
+Las consultas seleccionadas y los documentos esperados se resumen en la Tabla~\ref{tab:consultas}.
+
+\begin{table}[H]
+\centering
+\caption{Consultas experimentales y documentos esperados.}
+\label{tab:consultas}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{N.°} & \textbf{Consulta} & \textbf{Documentos esperados} \\
+\hline
+1 & ``inteligencia artificial aprendizaje'' & Doc 1, 3, 11 \\
+2 & ``seguridad informática redes protección'' & Doc 4, 2 \\
+3 & ``programación software desarrollo'' & Doc 7, 9 \\
+4 & ``datos bases consultas información'' & Doc 8, 6 \\
+5 & ``robots autónomos ingeniería'' & Doc 12 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Resultados obtenidos}
+
+La Tabla~\ref{tab:resultados} presenta los tres documentos con mayor similitud coseno para cada consulta.
+
+\begin{table}[H]
+\centering
+\caption{Top-3 de documentos recuperados por consulta.}
+\label{tab:resultados}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Consulta} & \textbf{Ranking} & \textbf{Documento} & \textbf{Similitud} \\
+\hline
+\multirow{3}{*}{1} & 1 & Doc 3 (Aprendizaje Automático) & 0.4629 \\
+                   & 2 & Doc 1 (Inteligencia Artificial) & 0.3873 \\
+                   & 3 & Doc 11 (Procesamiento Leng. Natural) & 0.2722 \\
+\hline
+\multirow{3}{*}{2} & 1 & Doc 4 (Ciberseguridad) & 0.1667 \\
+                   & 2 & Doc 2 (Redes Neuronales) & 0.1667 \\
+                   & 3 & Doc 1 (Inteligencia Artificial) & 0.1581 \\
+\hline
+\multirow{3}{*}{3} & 1 & Doc 9 (Prog. Orientada a Objetos) & 0.2981 \\
+                   & 2 & Doc 7 (Desarrollo de Software) & 0.2981 \\
+                   & 3 & Doc 5 (Sistemas Operativos) & 0.1543 \\
+\hline
+\multirow{3}{*}{4} & 1 & Doc 8 (Bases de Datos) & 0.5590 \\
+                   & 2 & Doc 6 (Computación en la Nube) & 0.2500 \\
+                   & 3 & Doc 4 (Ciberseguridad) & 0.2357 \\
+\hline
+\multirow{3}{*}{5} & 1 & Doc 12 (Robótica) & 0.3430 \\
+                   & 2--5 & Resto de documentos & 0.0000 \\
+                   & & & \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Análisis crítico de los resultados}
+
+\paragraph{Consulta 1: ``inteligencia artificial aprendizaje.''}
+El buscador recuperó correctamente los tres documentos más relevantes del corpus. Doc~3 (Aprendizaje Automático) obtuvo la mayor similitud (0.4629), lo cual es coherente dado que contiene los tres términos de la consulta. Doc~1 (Inteligencia Artificial) quedó en segundo lugar (0.3873), compartiendo dos de los tres términos. Un resultado interesante es la inclusión de Doc~11 (Procesamiento del Lenguaje Natural) en tercer lugar (0.2722): aunque trata un tema distinto, comparte el término ``inteligencia artificial'' por ser un subcampo de la IA, lo que demuestra que el buscador captura relaciones a nivel de vocabulario compartido.
+
+\paragraph{Consulta 2: ``seguridad informática redes protección.''}
+Esta consulta presenta las similitudes más bajas de las cinco (máximo 0.1667). Esto se explica porque los términos de la consulta están distribuidos en varios documentos y no concentrados en uno solo. Doc~4 (Ciberseguridad) y Doc~2 (Redes Neuronales) empatan con 0.1667: Doc~4 es el resultado esperado, pero Doc~2 aparece porque contiene la palabra ``redes'', aunque se refiere a redes neuronales y no a redes informáticas. Este es un ejemplo claro de \textbf{ambigüedad léxica}: la similitud coseno no distingue el significado contextual de una palabra.
+
+\paragraph{Consulta 3: ``programación software desarrollo.''}
+Doc~9 (Programación Orientada a Objetos) y Doc~7 (Desarrollo de Software) empatan con 0.2981, un resultado esperado ya que ambos documentos pertenecen al mismo dominio temático. Doc~5 (Sistemas Operativos) aparece en tercer lugar (0.1543) por compartir la palabra ``software'', lo cual es razonable.
+
+\paragraph{Consulta 4: ``datos bases consultas información.''}
+Esta fue la consulta con mayor similitud en su top-1 (0.5590), lo que indica una fuerte coincidencia léxica con Doc~8 (Bases de Datos Relacionales). Esto se debe a que Doc~8 contiene las palabras ``bases'', ``datos'', ``consultas'' e ``información'' en una sola oración. La aparición de Doc~4 (Ciberseguridad) en tercer lugar (0.2357) se justifica porque este documento también menciona ``datos'' e ``información'' en el contexto de protección de datos.
+
+\paragraph{Consulta 5: ``robots autónomos ingeniería.''}
+Doc~12 (Robótica) es el único resultado con similitud no nula (0.3430), y el resto obtiene 0.0000. Esto indica que los términos de la consulta son exclusivos de un solo documento del corpus, creando un escenario de \textbf{vocabulario aislado} donde la búsqueda identifica perfectamente al documento relevante, pero no puede establecer relaciones con otros documentos.
+
+\paragraph{Evaluación general de la calidad.}
+En 4 de las 5 consultas, el buscador recuperó correctamente el documento más relevante como primer resultado. El único caso problemático es la consulta~2, donde la ambigüedad léxica del término ``redes'' introduce un falso positivo. Esto pone de manifiesto la limitación principal del modelo Bag-of-Words: al ignorar el contexto y la semántica real de las palabras, dos documentos que comparten términos superficialmente pueden aparecer como ``similares'' sin serlo conceptualmente.
+
+% ─────────────────────────────────────────────────────────────────────────────
+% III.B — Análisis
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Impacto del tamaño del vocabulario}
+
+El tamaño del vocabulario define la dimensión del espacio vectorial en el que viven los documentos. Si el vocabulario tiene $n$ términos únicos, cada documento se representa como un vector en $\mathbb{R}^n$. Para analizar cómo afecta este parámetro al desempeño del buscador, se realizó un experimento reduciendo progresivamente el vocabulario a subconjuntos de los 10, 25, 50, 100 y 154 (total) términos más frecuentes del corpus.
+
+\subsubsection{Efecto sobre la representación vectorial}
+
+\begin{itemize}
+    \item \textbf{Vocabularios pequeños (10--25 términos):} Al conservar solo las palabras más frecuentes, se retiene únicamente el vocabulario compartido entre muchos documentos. Esto produce vectores ``homogéneos'' donde la mayoría de los documentos tienen valores similares, \textbf{reduciendo la capacidad discriminativa} del sistema. Las similitudes tienden a ser artificialmente altas o uniformemente bajas.
+
+    \item \textbf{Vocabularios medianos (50--100 términos):} Se alcanzan las palabras con frecuencia intermedia, que suelen ser las más informativas semánticamente (términos técnicos específicos de cada tema). La representación vectorial se vuelve más rica y las similitudes reflejan mejor las relaciones temáticas reales.
+
+    \item \textbf{Vocabulario completo (154 términos):} Incluye palabras que aparecen en un solo documento (\textit{hapax legomena}). Estas palabras aportan dimensiones donde solo un documento tiene valor no nulo, lo que puede introducir ruido en las similitudes.
+\end{itemize}
+
+\subsubsection{Efecto sobre la sparsidad}
+
+La sparsidad de la Matriz Documento-Término aumenta con el tamaño del vocabulario. Con 154 términos, la sparsidad medida fue del 89.8\%, lo que significa que casi el 90\% de las entradas de la matriz son cero. Esto es esperable: cada documento, al ser un texto breve, utiliza solo una fracción pequeña del vocabulario total. A medida que se añaden más columnas (más términos), la proporción de ceros crece porque los nuevos términos raramente aparecen en más de uno o dos documentos.
+
+\subsubsection{Trade-off fundamental}
+
+Existe un compromiso (trade-off) entre la \textbf{riqueza de la representación} y el \textbf{ruido dimensional}:
+\begin{itemize}
+    \item Un vocabulario demasiado pequeño pierde información discriminativa.
+    \item Un vocabulario demasiado grande introduce dimensiones con poca información (palabras que aparecen solo una vez).
+    \item El punto óptimo depende del corpus: para textos más largos y diversos, vocabularios mayores aportan más valor; para corpus pequeños como el nuestro, la ganancia marginal de superar los 100 términos es mínima.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Ventajas y limitaciones de la similitud coseno}
+
+\subsubsection{Ventajas}
+
+\begin{enumerate}
+    \item \textbf{Independencia de la magnitud:} La similitud coseno mide el ángulo entre vectores, no su longitud. Un documento de 500 palabras y otro de 50 sobre el mismo tema tendrán alta similitud, porque sus vectores apuntan en la misma dirección del espacio vectorial. Esto la hace superior a la distancia euclidiana para comparar textos de diferentes longitudes.
+
+    \item \textbf{Rango acotado:} El resultado siempre está en $[0, 1]$ (para vectores no negativos como los de frecuencia de términos), lo que facilita su interpretación: 1 = idénticos en dirección, 0 = sin relación alguna.
+
+    \item \textbf{Eficiencia computacional:} Se calcula con un producto punto y dos normas, operaciones que NumPy ejecuta en tiempo $O(n)$ con rutinas optimizadas en C. Esto permite comparar miles de documentos en fracciones de segundo.
+
+    \item \textbf{Simplicidad conceptual:} La fórmula $\cos(\theta) = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \|\vec{v}\|}$ se apoya directamente en conceptos de álgebra lineal (producto punto, norma, ángulo), lo que la hace fácil de explicar e interpretar geométricamente.
+\end{enumerate}
+
+\subsubsection{Limitaciones}
+
+\begin{enumerate}
+    \item \textbf{No captura semántica profunda:} La similitud coseno opera sobre frecuencias de términos, no sobre significados. Dos documentos que hablan del mismo tema con vocabulario distinto (sinónimos) tendrán baja similitud. Por ejemplo, un documento que use ``carro'' y otro que use ``automóvil'' para referirse al mismo concepto serían considerados disímiles.
+
+    \item \textbf{Ambigüedad léxica (polisemia):} Como se observó en la consulta~2, la palabra ``redes'' puede referirse a redes informáticas o a redes neuronales. La similitud coseno no distingue entre estos significados, tratando todas las ocurrencias de una palabra como idénticas sin importar el contexto.
+
+    \item \textbf{No detecta negación ni sarcasmo:} Los documentos ``la inteligencia artificial es beneficiosa'' y ``la inteligencia artificial no es beneficiosa'' producirían vectores casi idénticos (solo difieren en la palabra ``no'', que además suele eliminarse como stopword), a pesar de transmitir significados opuestos.
+
+    \item \textbf{Insensibilidad al orden de palabras:} El modelo Bag-of-Words descarta el orden de las palabras. ``El perro mordió al hombre'' y ``El hombre mordió al perro'' generan exactamente el mismo vector, aunque sus significados son radicalmente diferentes.
+
+    \item \textbf{Sensibilidad al vocabulario del corpus:} Si la consulta contiene palabras que no existen en el vocabulario del corpus, estas se ignoran completamente. Una consulta con términos exclusivamente fuera del vocabulario producirá un vector nulo y similitud 0 con todos los documentos.
+\end{enumerate}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Representación gráfica de los resultados}
+
+A continuación se presentan las visualizaciones generadas por el módulo \texttt{src/visualizacion.py}, que permiten interpretar los resultados del buscador desde distintas perspectivas.
+
+\subsubsection{Mapa de calor de similitud coseno}
+
+La Figura~\ref{fig:heatmap} muestra la matriz de similitud coseno entre los 12 documentos del corpus. Cada celda $(i, j)$ representa el valor $\cos(\theta)$ entre los vectores de los documentos $i$ y $j$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{graficos/heatmap_similitud.png}
+    \caption{Matriz de similitud coseno entre documentos. La diagonal principal es 1.00 (cada documento es idéntico a sí mismo). Las celdas con tonos cálidos indican mayor similitud semántica.}
+    \label{fig:heatmap}
+\end{figure}
+
+\textbf{Interpretación:} Se observan clústeres temáticos claros: Doc~1 y Doc~3 (IA y ML, similitud 0.24) forman un grupo; Doc~5 y Doc~7 (Sistemas Operativos y Desarrollo de Software, similitud 0.21) forman otro. La mayoría de las similitudes inter-temáticas son cercanas a 0, confirmando que documentos de temas distintos comparten poco vocabulario. La simetría de la matriz ($M_{ij} = M_{ji}$) valida la implementación.
+
+\subsubsection{Reducción dimensional con PCA}
+
+La Figura~\ref{fig:pca} presenta los 12 documentos proyectados en un plano bidimensional mediante Análisis de Componentes Principales (PCA). Se incluye una consulta de ejemplo (``inteligencia artificial aprendizaje'') como punto de referencia.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{graficos/pca_documentos.png}
+    \caption{Proyección PCA de los documentos a 2 dimensiones. La estrella roja representa la consulta. Los documentos más cercanos a la consulta en este espacio reducido son los más similares semánticamente.}
+    \label{fig:pca}
+\end{figure}
+
+\textbf{Interpretación:} PCA reduce las 154 dimensiones del espacio vectorial a 2, conservando las direcciones de máxima varianza. Los ejes (Componente Principal 1 y 2) no representan términos individuales, sino combinaciones lineales de todos los términos que mejor separan los datos. Se observa que documentos temáticamente relacionados (Doc~1, Doc~3, Doc~11 — todos del ámbito de IA) se agrupan en la misma región del plano, mientras que documentos de temas distintos se dispersan. La consulta (estrella roja) cae cerca del clúster de IA, validando que el buscador la ubica correctamente en el espacio vectorial.
+
+\subsubsection{Frecuencia de términos}
+
+La Figura~\ref{fig:frecuencia} muestra los 15 términos más frecuentes del corpus tras el preprocesamiento (eliminación de stopwords).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{graficos/frecuencia_terminos.png}
+    \caption{Top-15 términos más frecuentes del corpus. ``datos'' lidera con 6 apariciones, seguido de ``inteligencia'' y ``sistemas'' con 4 cada uno.}
+    \label{fig:frecuencia}
+\end{figure}
+
+\textbf{Interpretación:} El término más frecuente (``datos'') aparece en 6 de los 12 documentos, lo que indica que es un concepto transversal a varias áreas de la computación. Términos como ``inteligencia'', ``sistemas'' y ``artificial'' reflejan el sesgo temático del corpus hacia la inteligencia artificial. La distribución sigue una forma similar a la \textbf{ley de Zipf}: pocos términos son muy frecuentes y la mayoría aparece una o dos veces.
+
+\subsubsection{Resultados de búsqueda}
+
+La Figura~\ref{fig:busqueda} presenta un ejemplo de los resultados de la consulta~1, visualizados como barras horizontales proporcionales a la similitud coseno.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{graficos/busqueda_1.png}
+    \caption{Resultados de búsqueda para ``inteligencia artificial aprendizaje''. Las barras de mayor longitud y color más cálido indican mayor relevancia.}
+    \label{fig:busqueda}
+\end{figure}
+
+\textbf{Interpretación:} El gradiente de color (verde oscuro → amarillo → sin barra) permite identificar rápidamente los documentos relevantes. La caída abrupta a 0.0000 entre Doc~11 y los documentos restantes indica una separación clara entre documentos que comparten vocabulario con la consulta y los que no tienen ningún término en común.
