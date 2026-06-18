@@ -86,18 +86,112 @@
 % SECCIÓN I — Marco Teórico
 % =============================================================================
 \section{Marco Teórico}
-% TODO: Seba redacta la parte de Espacios Vectoriales de Texto
-% TODO: Dani redacta la parte de Similitud Coseno + Ejemplo Matemático
+% Responsable: Seba (Sección I — Espacios Vectoriales) + Dani (Similitud Coseno)
+% Estado: Borrador inicial generado a partir del código implementado.
+%         Seba y Dani deben revisar, personalizar y expandir.
 
-\textit{(Sección pendiente — Redactada por Seba y Dani.)}
+\subsection{Espacios Vectoriales de Texto}
+
+En el contexto de la recuperación de información, los documentos de texto se representan como vectores numéricos dentro de un \textbf{espacio vectorial}. La idea fundamental es transformar cada documento en un punto de $\mathbb{R}^n$, donde $n$ corresponde al número de términos únicos (vocabulario) del corpus.
+
+\subsubsection{Representación vectorial de documentos}
+
+Cada documento $d_i$ se representa como un vector de frecuencias:
+\[
+\vec{d_i} = (f_{i,1},\ f_{i,2},\ \ldots,\ f_{i,n}) \in \mathbb{R}^n
+\]
+donde $f_{i,j}$ es la frecuencia del término $j$ en el documento $i$. Este modelo se denomina \textbf{Bag-of-Words} (bolsa de palabras), ya que ignora el orden de las palabras y solo retiene cuántas veces aparece cada una.
+
+\subsubsection{Dimensión del espacio vectorial}
+
+La dimensión del espacio está determinada por el \textbf{tamaño del vocabulario}: el conjunto de todas las palabras únicas que aparecen en el corpus tras el preprocesamiento. En nuestra implementación, el corpus de 12 documentos genera un vocabulario de 154 términos únicos, por lo que cada documento es un vector en $\mathbb{R}^{154}$.
+
+\subsubsection{Interpretación geométrica}
+
+Dos documentos que tratan temas similares comparten más términos en común, lo que significa que sus vectores apuntan en direcciones parecidas dentro del espacio vectorial. La ``cercanía'' entre documentos no se mide por distancia euclidiana (que es sensible a la longitud del texto), sino por el \textbf{ángulo} entre sus vectores, como se detalla en la siguiente subsección.
+
+\subsection{Similitud Coseno}
+
+La similitud coseno mide la semejanza entre dos vectores a través del coseno del ángulo que forman, independientemente de su magnitud:
+
+\begin{equation}
+\cos(\theta) = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \cdot \|\vec{v}\|} = \frac{\displaystyle\sum_{i=1}^{n} u_i \cdot v_i}{\sqrt{\displaystyle\sum_{i=1}^{n} u_i^2} \cdot \sqrt{\displaystyle\sum_{i=1}^{n} v_i^2}}
+\label{eq:coseno}
+\end{equation}
+
+\begin{itemize}
+    \item Si $\cos(\theta) = 1$: los vectores apuntan en la misma dirección (documentos idénticos en distribución de términos).
+    \item Si $\cos(\theta) = 0$: los vectores son ortogonales (no comparten ningún término).
+    \item Para vectores de frecuencia (no negativos), $\cos(\theta) \in [0, 1]$.
+\end{itemize}
+
+\subsubsection{Ejemplo matemático simple}
+
+Consideremos dos frases breves como documentos, con un vocabulario simplificado de 4 términos: \{``inteligencia'', ``artificial'', ``aprendizaje'', ``datos''\}.
+
+\begin{itemize}
+    \item \textbf{Frase A:} ``la inteligencia artificial utiliza aprendizaje'' $\rightarrow \vec{a} = (1, 1, 1, 0)$
+    \item \textbf{Frase B:} ``el aprendizaje de datos e inteligencia'' $\rightarrow \vec{b} = (1, 0, 1, 1)$
+\end{itemize}
+
+\paragraph{Paso 1 — Producto punto:}
+\[
+\vec{a} \cdot \vec{b} = (1)(1) + (1)(0) + (1)(1) + (0)(1) = 2
+\]
+
+\paragraph{Paso 2 — Normas:}
+\[
+\|\vec{a}\| = \sqrt{1^2 + 1^2 + 1^2 + 0^2} = \sqrt{3} \approx 1.732
+\]
+\[
+\|\vec{b}\| = \sqrt{1^2 + 0^2 + 1^2 + 1^2} = \sqrt{3} \approx 1.732
+\]
+
+\paragraph{Paso 3 — Similitud coseno:}
+\[
+\cos(\theta) = \frac{2}{\sqrt{3} \cdot \sqrt{3}} = \frac{2}{3} \approx 0.667
+\]
+
+\paragraph{Interpretación:} Una similitud de 0.667 indica que las frases comparten una proporción significativa de vocabulario (``inteligencia'' y ``aprendizaje''), lo que sugiere relación temática. La frase A incluye ``artificial'' (ausente en B) y la frase B incluye ``datos'' (ausente en A), lo que impide una similitud de 1.0.
 
 % =============================================================================
 % SECCIÓN II — Representación de Documentos
 % =============================================================================
 \section{Representación de Documentos}
-% TODO: Seba redacta esta sección completa
+% Responsable: Seba
+% Estado: Borrador inicial. Seba debe revisar y personalizar.
 
-\textit{(Sección pendiente — Redactada por Seba.)}
+\subsection{Pipeline de preprocesamiento}
+
+Antes de convertir los documentos en vectores, cada texto pasa por un pipeline de limpieza implementado en \texttt{src/preprocesamiento.py}:
+
+\begin{enumerate}
+    \item \textbf{Normalización:} conversión a minúsculas para eliminar diferencias como ``Datos'' vs. ``datos''.
+    \item \textbf{Limpieza:} eliminación de signos de puntuación y caracteres especiales mediante expresiones regulares, conservando únicamente letras del alfabeto español y espacios.
+    \item \textbf{Tokenización:} separación del texto en palabras individuales (\textit{tokens}).
+    \item \textbf{Remoción de stopwords:} eliminación de palabras funcionales (artículos, preposiciones, conjunciones) que no aportan contenido semántico. Se utiliza una lista propia de 75 palabras vacías en español definida en la constante \texttt{PALABRAS\_VACIAS\_ES}.
+\end{enumerate}
+
+\subsection{Construcción de la Matriz Documento-Término}
+
+La vectorización, implementada en \texttt{src/vectorizacion.py}, consta de dos pasos:
+
+\subsubsection{Vocabulario}
+Se recorren todos los documentos preprocesados para extraer el conjunto de términos únicos, ordenados alfabéticamente. Cada término recibe un índice entero que define su posición como columna en la matriz.
+
+\subsubsection{Matriz de frecuencias}
+Se construye una matriz $M \in \mathbb{R}^{m \times n}$ donde $m = 12$ (documentos) y $n = 154$ (términos del vocabulario):
+\[
+M_{ij} = \text{frecuencia del término } j \text{ en el documento } i
+\]
+
+\subsection{Sparsidad de la matriz}
+
+La sparsidad medida fue del \textbf{89.8\%}, lo que significa que el 89.8\% de las celdas de la matriz contienen el valor 0. Esto es típico del modelo Bag-of-Words: cada documento breve utiliza solo una fracción del vocabulario total. Una matriz \textit{rala} (sparse) tiene implicaciones para la eficiencia computacional y para la calidad de las similitudes calculadas.
+
+\subsection{Corpus utilizado}
+
+El corpus consta de 12 documentos breves sobre temas de Ciencias de la Computación, almacenados en \texttt{data/documentos/corpus.txt} (una línea por documento). Los temas abarcan: Inteligencia Artificial, Redes Neuronales, Aprendizaje Automático, Ciberseguridad, Sistemas Operativos, Computación en la Nube, Desarrollo de Software, Bases de Datos, Programación OO, Algoritmos, PLN y Robótica.
 
 % =============================================================================
 % SECCIÓN III — Implementación Computacional
@@ -105,9 +199,39 @@
 \section{Implementación Computacional}
 
 \subsection{Álgebra lineal y operaciones vectoriales para recuperación de información}
-% TODO: Dani redacta esta subsección (III.A.1)
+% Responsable: Dani (III.A.1)
+% Estado: Borrador inicial basado en similitud.py y buscador.py de Dani.
+%         Dani debe revisar, personalizar y expandir.
 
-\textit{(Subsección pendiente — Redactada por Dani.)}
+La recuperación de información basada en vectores se apoya en tres operaciones fundamentales del álgebra lineal, implementadas en \texttt{src/similitud.py}:
+
+\begin{enumerate}
+    \item \textbf{Producto punto} (\texttt{producto\_punto(u, v)}): calcula $\vec{u} \cdot \vec{v} = \sum_{i=1}^{n} u_i v_i$ mediante \texttt{numpy.dot()}, que ejecuta la operación en código compilado C, logrando tiempos $O(n)$ significativamente menores que un bucle Python equivalente.
+
+    \item \textbf{Norma euclidiana} (\texttt{norma\_euclidiana(vector)}): calcula $\|\vec{v}\| = \sqrt{\sum_{i=1}^{n} v_i^2}$ mediante \texttt{numpy.linalg.norm()}.
+
+    \item \textbf{Similitud coseno} (\texttt{similitud\_coseno(u, v)}): aplica la Ecuación~\ref{eq:coseno}. Se incorpora una tolerancia numérica $\varepsilon = 10^{-12}$ para evitar la división entre cero cuando algún vector tiene norma nula (documento sin términos del vocabulario o consulta sin coincidencias).
+\end{enumerate}
+
+\subsubsection{Motor de búsqueda}
+
+La clase \texttt{BuscadorSemantico} (\texttt{src/buscador.py}) encapsula el proceso de búsqueda:
+
+\begin{enumerate}
+    \item \textbf{Vectorización de la consulta:} el texto de búsqueda pasa por el mismo pipeline de preprocesamiento que los documentos y se convierte en un vector de frecuencias usando el vocabulario existente. Términos de la consulta que no existen en el vocabulario se ignoran.
+
+    \item \textbf{Cálculo de similitudes:} se computa la similitud coseno entre el vector consulta $\vec{q}$ y cada fila $\vec{d_i}$ de la Matriz Documento-Término. La implementación utiliza multiplicación matricial vectorizada ($M \cdot \vec{q}$) para calcular todos los productos punto simultáneamente, evitando un bucle explícito.
+
+    \item \textbf{Ranking:} los documentos se ordenan de mayor a menor similitud mediante \texttt{numpy.argsort()}, retornando los top-$k$ resultados.
+\end{enumerate}
+
+\subsubsection{Optimización: Matriz de similitud pre-computada}
+
+Para generar el mapa de calor entre todos los documentos, se implementó un cálculo vectorizado de la matriz de similitudes completa:
+\[
+S = \hat{M} \cdot \hat{M}^T
+\]
+donde $\hat{M}$ es la matriz con filas normalizadas ($\hat{d_i} = \vec{d_i} / \|\vec{d_i}\|$). Cada celda $S_{ij} = \cos(\theta_{ij})$ se obtiene en una sola operación matricial, lo cual es significativamente más eficiente que calcular las $\binom{m}{2}$ similitudes individualmente.
 
 % ─── Sección de Renato: Análisis Experimental ───────────────────────────────
 \input{seccion_III_analisis}
@@ -116,18 +240,59 @@
 % SECCIÓN IV — Reflexión y Conclusiones
 % =============================================================================
 \section{Reflexión y Conclusiones}
-% TODO: Rodri redacta esta sección
+% Responsable: Rodri
+% Estado: Borrador inicial. Rodri debe revisar, personalizar y expandir.
 
-\textit{(Sección pendiente — Redactada por Rodri.)}
+\subsection{Evolución de los vectores en aplicaciones modernas}
+
+El modelo vectorial de recuperación de información, utilizado en este proyecto en su forma más básica (Bag-of-Words con frecuencia de términos), es el fundamento teórico sobre el que se construyen tecnologías modernas como:
+
+\begin{itemize}
+    \item \textbf{Word2Vec y GloVe:} algoritmos que representan palabras como vectores densos en espacios de 100--300 dimensiones, capturando relaciones semánticas (ej. \textit{rey - hombre + mujer $\approx$ reina}).
+    \item \textbf{Transformers y Modelos de Lenguaje (GPT, BERT):} generan representaciones vectoriales contextuales donde el significado de una palabra depende de su entorno. Estos \textit{embeddings} se comparan usando la misma similitud coseno que nuestro buscador.
+    \item \textbf{Motores de búsqueda modernos (Google, Bing):} combinan búsqueda vectorial semántica con índices invertidos tradicionales para balancear precisión y velocidad.
+\end{itemize}
+
+\subsection{Limitaciones del buscador basado en TF}
+
+\begin{enumerate}
+    \item \textbf{No captura sinónimos:} ``automóvil'' y ``carro'' son vectores distintos, aunque significan lo mismo.
+    \item \textbf{No considera la importancia relativa de los términos:} un término que aparece en todos los documentos (alta frecuencia) recibe el mismo peso que uno específico. Esquemas como TF-IDF mitigan esto.
+    \item \textbf{Dimensionalidad fija:} el vocabulario se define una vez; documentos nuevos pueden contener términos desconocidos.
+    \item \textbf{Corpus pequeño:} con solo 12 documentos, las similitudes están limitadas por la cantidad de vocabulario compartido.
+\end{enumerate}
+
+\subsection{Conclusiones}
+
+El buscador semántico implementado demuestra exitosamente cómo las operaciones de álgebra lineal —producto punto, norma y similitud coseno— permiten transformar un problema lingüístico en uno matemático resoluble computacionalmente. A pesar de la simplicidad del modelo Bag-of-Words, el sistema recupera correctamente los documentos relevantes en 4 de las 5 consultas experimentales, con una identificación clara de clústeres temáticos en el análisis PCA.
+
+Las principales fortalezas del enfoque son su transparencia matemática, su eficiencia computacional y su fundamentación directa en conceptos de álgebra lineal. Sus limitaciones —ambigüedad léxica, insensibilidad al orden, incapacidad de captar sinónimos— motivan el estudio de modelos más avanzados como TF-IDF, embeddings densos y transformers.
 
 % =============================================================================
 % SECCIÓN V — Anexos
 % =============================================================================
 \section{Anexos}
-% TODO: Rodri completa esta sección
+% Responsable: Rodri
+% Estado: Borrador. Rodri debe completar la justificación de originalidad.
 
-\subsection{Lenguaje de programación}
-Python 3.9+
+\subsection{Estructura del proyecto}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Módulo} & \textbf{Responsable} & \textbf{Función principal} \\
+\hline
+\texttt{preprocesamiento.py} & Seba & Limpieza, tokenización, stopwords \\
+\texttt{vectorizacion.py} & Seba & Vocabulario + Matriz Doc-Término \\
+\texttt{similitud.py} & Dani & Producto punto, norma, coseno \\
+\texttt{buscador.py} & Dani & Clase BuscadorSemantico \\
+\texttt{visualizacion.py} & Renato & Heatmap, PCA, gráficos \\
+\texttt{main.py} & Rodrigo & Integración, menú, demo \\
+\hline
+\end{tabular}
+\caption{Distribución de módulos por integrante.}
+\end{table}
 
 \subsection{Bibliotecas utilizadas}
 \begin{table}[H]
@@ -136,18 +301,18 @@ Python 3.9+
 \hline
 \textbf{Biblioteca} & \textbf{Versión} & \textbf{Uso} \\
 \hline
-NumPy & 2.4.6 & Vectores, matrices, producto punto, norma \\
-Matplotlib & 3.11.0 & Gráficos de barras, scatter plots \\
-Seaborn & 0.13.2 & Heatmap de similitud coseno \\
-scikit-learn & 1.9.0 & PCA para reducción dimensional \\
-SciPy & 1.17.1 & Utilidades matemáticas de soporte \\
+NumPy & $\geq$1.24 & Vectores, matrices, producto punto, norma \\
+Matplotlib & $\geq$3.7 & Gráficos de barras, scatter plots \\
+Seaborn & $\geq$0.12 & Heatmap de similitud coseno \\
+scikit-learn & $\geq$1.3 & PCA para reducción dimensional \\
+SciPy & $\geq$1.11 & Utilidades matemáticas de soporte \\
 \hline
 \end{tabular}
 \caption{Bibliotecas de Python utilizadas en el proyecto.}
 \end{table}
 
 \subsection{Código documentado}
-El código fuente completo se encuentra en el repositorio del proyecto, organizado en los módulos descritos en este informe. Cada función incluye docstrings detallados explicando su propósito, parámetros, retorno y decisiones de diseño algorítmico.
+El código fuente completo se encuentra en el repositorio del proyecto, organizado en los módulos descritos en este informe. Cada función incluye docstrings detallados explicando su propósito, parámetros, retorno y decisiones algorítmicas.
 
 \subsection{Bibliografía}
 \begin{itemize}
@@ -158,3 +323,4 @@ El código fuente completo se encuentra en el repositorio del proyecto, organiza
 \end{itemize}
 
 \end{document}
+

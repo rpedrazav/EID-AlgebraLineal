@@ -29,12 +29,17 @@ Cuando los demás terminen, solo reemplazas tus `mocks` por los datos reales.
 > 📝 **Formato:** El informe se redactará en **LaTeX**, compilable en **Overleaf**.
 > 
 > 📌 **2ª Revisión — 17/06/2026:** Se creó la estructura LaTeX del informe (`informe/main.tex`) y se redactó la Sección III completa de Renato (`informe/seccion_III_analisis.tex`). Las secciones de los demás compañeros quedan marcadas como `TODO`.
+>
+> 📌 **3ª Revisión — 18/06/2026:** Revisión de avances de Seba, Dani y Rodri. Pipeline verificado tras sus cambios (funcional, mismos resultados). Se actualiza el LaTeX con los cambios del equipo. Detalle de avances del equipo:
+> - **Seba** (commits `cbe9e40`, `3d80edd`): Personalizó `preprocesamiento.py` y `vectorizacion.py` — renombró variable a `PALABRAS_VACIAS_ES`, simplificó docstrings, marcó todas sus tareas de código como `[x]`. Informe pendiente.
+> - **Dani** (commit `7164f72`): Personalizó `similitud.py` y `buscador.py` — renombró funciones (`producto_punto`, `norma_euclidiana`), añadió `_EPSILON_NORMA` para tolerancia numérica, optimizó `calcular_matriz_similitud()` con multiplicación matricial vectorizada (`M̂ @ M̂ᵀ`), pre-calcula normas en `__init__`. Actualizó `__init__.py` con nuevos nombres. Informe pendiente.
+> - **Rodri** (commits `303e8f2`, `cbdf320`): Refactorizó `main.py` (de 584 a 362 líneas), creó `README.md` completo, creó `docs/EID_Lineal (2).pdf`. Corrigió errores post-merge.
 
 - [x] **Redactar Sección III (Análisis Experimental - Excluyendo III.A.1)**: ✅ *Completado el 17/06/2026*
-  - [x] Redactar la estructura del análisis. (Nota: La apertura III.A.1 sobre álgebra lineal la redactará la Persona 2, tú encárgate del análisis empírico).
+  - [x] Redactar la estructura del análisis.
   - [x] Analizar críticamente los resultados: describir documentos recuperados, evaluar las similitudes calculadas y debatir sobre la calidad de las recomendaciones.
   - [x] Redactar un apartado analizando explícitamente **cómo afecta el tamaño del vocabulario** a la representación vectorial y al desempeño general del motor.
-  - [x] Explicar las ventajas y limitaciones de usar la similitud coseno (ej. no detecta sarcasmo, palabras con múltiples significados o contexto temporal).
+  - [x] Explicar las ventajas y limitaciones de usar la similitud coseno.
 
 ## Tareas de la Presentación
 
@@ -45,5 +50,6 @@ Cuando los demás terminen, solo reemplazas tus `mocks` por los datos reales.
 ## Requisito de Conocimiento Global (Cross-Training y Bibliotecas)
 
 - [ ] Explicar al equipo cómo interpretar correctamente cada gráfico generado para que cualquiera pueda exponer esa diapositiva en caso de que le pregunten aleatoriamente.
-- [ ] Revisar que la integración del programa de Persona 4 (`main.py`) arroje los mismos resultados que tienes en tu Jupyter Notebook.
+- [x] Revisar que la integración del programa de Persona 4 (`main.py`) arroje los mismos resultados que tienes en tu Jupyter Notebook. ✅ *Verificado el 18/06/2026 — pipeline produce idénticos resultados tras cambios de Rodri.*
 - [ ] **Defensa de Bibliotecas:** Debes dar una pequeña charla al resto del equipo explicando el uso de `matplotlib`, `seaborn` y especialmente **`sklearn.decomposition.PCA`**. Todo el equipo debe ser capaz de defender por qué se utilizó PCA y cómo funcionan estas herramientas científicas (15% de la nota final).
+
