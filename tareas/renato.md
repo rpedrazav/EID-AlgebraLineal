@@ -27,11 +27,14 @@ Cuando los demás terminen, solo reemplazas tus `mocks` por los datos reales.
 ## Tareas del Informe (`informe/`)
 
 > 📝 **Formato:** El informe se redactará en **LaTeX**, compilable en **Overleaf**.
-- [ ] **Redactar Sección III (Análisis Experimental - Excluyendo III.A.1)**:
-  - [ ] Redactar la estructura del análisis. (Nota: La apertura III.A.1 sobre álgebra lineal la redactará la Persona 2, tú encárgate del análisis empírico).
-  - [ ] Analizar críticamente los resultados: describir documentos recuperados, evaluar las similitudes calculadas y debatir sobre la calidad de las recomendaciones.
-  - [ ] Redactar un apartado analizando explícitamente **cómo afecta el tamaño del vocabulario** a la representación vectorial y al desempeño general del motor.
-  - [ ] Explicar las ventajas y limitaciones de usar la similitud coseno (ej. no detecta sarcasmo, palabras con múltiples significados o contexto temporal).
+> 
+> 📌 **2ª Revisión — 17/06/2026:** Se creó la estructura LaTeX del informe (`informe/main.tex`) y se redactó la Sección III completa de Renato (`informe/seccion_III_analisis.tex`). Las secciones de los demás compañeros quedan marcadas como `TODO`.
+
+- [x] **Redactar Sección III (Análisis Experimental - Excluyendo III.A.1)**: ✅ *Completado el 17/06/2026*
+  - [x] Redactar la estructura del análisis. (Nota: La apertura III.A.1 sobre álgebra lineal la redactará la Persona 2, tú encárgate del análisis empírico).
+  - [x] Analizar críticamente los resultados: describir documentos recuperados, evaluar las similitudes calculadas y debatir sobre la calidad de las recomendaciones.
+  - [x] Redactar un apartado analizando explícitamente **cómo afecta el tamaño del vocabulario** a la representación vectorial y al desempeño general del motor.
+  - [x] Explicar las ventajas y limitaciones de usar la similitud coseno (ej. no detecta sarcasmo, palabras con múltiples significados o contexto temporal).
 
 ## Tareas de la Presentación
 

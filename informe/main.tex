@@ -1,0 +1,160 @@
+% =============================================================================
+% Informe — Buscador Semántico Simple utilizando Representación Vectorial
+% Curso: Álgebra Lineal para la Computación
+% Grupo 2: Rodrigo, Seba, Dani, Renato
+% =============================================================================
+\documentclass[12pt, a4paper]{article}
+
+% ─── Paquetes ────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}                    % Fuente Latin Modern
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{graphicx}                   % Imágenes
+\usepackage{float}                      % Posicionamiento [H]
+\usepackage{amsmath, amssymb}           % Matemáticas
+\usepackage{booktabs}                   % Tablas profesionales
+\usepackage{multirow}                   % Celdas multi-fila
+\usepackage{hyperref}                   % Enlaces
+\usepackage{caption}                    % Captions mejorados
+\usepackage{enumitem}                   % Listas personalizables
+\usepackage{xcolor}                     % Colores
+\usepackage{listings}                   % Código fuente
+\usepackage{fancyhdr}                   % Encabezados
+
+% ─── Configuración de listings (código Python) ──────────────────────────────
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{red!70!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    captionpos=b,
+}
+
+% ─── Configuración de hyperref ───────────────────────────────────────────────
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    urlcolor=blue!70!black,
+    citecolor=blue!70!black,
+}
+
+% ─── Encabezados ─────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Álgebra Lineal para la Computación}
+\fancyhead[R]{\small Grupo 2}
+\fancyfoot[C]{\thepage}
+
+% =============================================================================
+\begin{document}
+
+% ─── Portada ─────────────────────────────────────────────────────────────────
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+
+{\Large\textbf{Proyecto de Investigación 2}}\\[0.5cm]
+{\LARGE\textbf{Buscador Semántico Simple utilizando\\Representación Vectorial de Texto}}\\[2cm]
+
+{\large\textbf{Curso:} Álgebra Lineal para la Computación}\\[1cm]
+
+{\large\textbf{Integrantes:}}\\[0.3cm]
+\begin{tabular}{ll}
+    Rodrigo & — Integración y Project Manager \\
+    Seba    & — Preprocesamiento y Vectorización \\
+    Dani    & — Álgebra Lineal y Motor de Búsqueda \\
+    Renato  & — Análisis Experimental y Visualización \\
+\end{tabular}
+
+\vfill
+{\large Junio 2026}
+\end{titlepage}
+
+% ─── Tabla de contenidos ─────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% =============================================================================
+% SECCIÓN I — Marco Teórico
+% =============================================================================
+\section{Marco Teórico}
+% TODO: Seba redacta la parte de Espacios Vectoriales de Texto
+% TODO: Dani redacta la parte de Similitud Coseno + Ejemplo Matemático
+
+\textit{(Sección pendiente — Redactada por Seba y Dani.)}
+
+% =============================================================================
+% SECCIÓN II — Representación de Documentos
+% =============================================================================
+\section{Representación de Documentos}
+% TODO: Seba redacta esta sección completa
+
+\textit{(Sección pendiente — Redactada por Seba.)}
+
+% =============================================================================
+% SECCIÓN III — Implementación Computacional
+% =============================================================================
+\section{Implementación Computacional}
+
+\subsection{Álgebra lineal y operaciones vectoriales para recuperación de información}
+% TODO: Dani redacta esta subsección (III.A.1)
+
+\textit{(Subsección pendiente — Redactada por Dani.)}
+
+% ─── Sección de Renato: Análisis Experimental ───────────────────────────────
+\input{seccion_III_analisis}
+
+% =============================================================================
+% SECCIÓN IV — Reflexión y Conclusiones
+% =============================================================================
+\section{Reflexión y Conclusiones}
+% TODO: Rodri redacta esta sección
+
+\textit{(Sección pendiente — Redactada por Rodri.)}
+
+% =============================================================================
+% SECCIÓN V — Anexos
+% =============================================================================
+\section{Anexos}
+% TODO: Rodri completa esta sección
+
+\subsection{Lenguaje de programación}
+Python 3.9+
+
+\subsection{Bibliotecas utilizadas}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Biblioteca} & \textbf{Versión} & \textbf{Uso} \\
+\hline
+NumPy & 2.4.6 & Vectores, matrices, producto punto, norma \\
+Matplotlib & 3.11.0 & Gráficos de barras, scatter plots \\
+Seaborn & 0.13.2 & Heatmap de similitud coseno \\
+scikit-learn & 1.9.0 & PCA para reducción dimensional \\
+SciPy & 1.17.1 & Utilidades matemáticas de soporte \\
+\hline
+\end{tabular}
+\caption{Bibliotecas de Python utilizadas en el proyecto.}
+\end{table}
+
+\subsection{Código documentado}
+El código fuente completo se encuentra en el repositorio del proyecto, organizado en los módulos descritos en este informe. Cada función incluye docstrings detallados explicando su propósito, parámetros, retorno y decisiones de diseño algorítmico.
+
+\subsection{Bibliografía}
+\begin{itemize}
+    \item Manning, C. D., Raghavan, P., \& Schütze, H. (2008). \textit{Introduction to Information Retrieval}. Cambridge University Press.
+    \item Strang, G. (2016). \textit{Introduction to Linear Algebra} (5th ed.). Wellesley-Cambridge Press.
+    \item NumPy Documentation: \url{https://numpy.org/doc/}
+    \item scikit-learn PCA: \url{https://scikit-learn.org/stable/modules/decomposition.html#pca}
+\end{itemize}
+
+\end{document}
