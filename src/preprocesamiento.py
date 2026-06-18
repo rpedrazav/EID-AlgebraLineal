@@ -1,33 +1,30 @@
 """
 Módulo de Preprocesamiento de Texto
 ====================================
-Responsable: Persona 1 (Seba)
+Autor: Sebastián (Persona 1)
 
-Este módulo se encarga de transformar los textos en bruto (raw) a un formato
-limpio y tokenizado, listo para la etapa de vectorización.
+Este script se encarga de tomar los datos de texto sin procesar y 
+transformarlos a un formato limpio y tokenizado. Esto es fundamental
+para luego poder representarlos algebraicamente como vectores.
 
-Decisiones de diseño:
-- Se usa una lista manual de stopwords en español en lugar de NLTK para
-  minimizar dependencias externas y mantener el proyecto ligero.
-- La limpieza elimina toda puntuación y caracteres especiales usando
-  expresiones regulares estándar de Python (módulo 're'), evitando
-  dependencias adicionales.
-- Se optó por tokenización simple (split por espacios) dado que para un
-  modelo Bag-of-Words con frecuencia de términos, este enfoque es
-  suficiente y transparente.
+Notas de diseño:
+- He optado por usar un set de palabras vacías (stopwords) manual en español,
+  para no tener que depender de librerías grandes como NLTK o spaCy.
+- La limpieza se hace utilizando expresiones regulares nativas ('re').
+- La tokenización es un simple split por espacios, ideal para nuestro
+  modelo de bolsa de palabras (BoW).
 """
 
 import os
 import re
 
-
 # ============================================================================
-# Stopwords en español (lista curada manualmente)
+# Lista de palabras vacías en español (Stopwords)
 # ============================================================================
-# Estas son palabras funcionales del idioma español que no aportan significado
-# semántico al análisis. Se excluyen del vocabulario para reducir la dimensión
-# del espacio vectorial y mejorar la calidad de las similitudes calculadas.
-STOPWORDS_ES = {
+# Estas palabras se repiten mucho pero no aportan un significado real
+# (artículos, preposiciones, etc.). Las quitamos para reducir el ruido
+# en nuestros datos y disminuir las dimensiones de los vectores.
+PALABRAS_VACIAS_ES = {
     "el", "la", "los", "las", "un", "una", "unos", "unas",
     "de", "del", "al", "a", "en", "con", "por", "para",
     "y", "o", "u", "e", "ni", "que", "como", "se", "su",
@@ -42,193 +39,93 @@ STOPWORDS_ES = {
     "ha", "han", "hay", "he", "hemos", "sido", "siendo",
 }
 
-
 def cargar_documentos(ruta_carpeta):
     """
-    Carga documentos de texto desde un archivo o carpeta.
-
-    Si la ruta apunta a un archivo .txt, lee cada línea no vacía como
-    un documento independiente. Si es una carpeta, busca todos los .txt
-    dentro de ella.
-
-    Parámetros
-    ----------
-    ruta_carpeta : str
-        Ruta al archivo o carpeta que contiene los documentos.
-
-    Retorna
-    -------
-    list[str]
-        Lista de cadenas de texto, cada una representando un documento.
-
-    Ejemplo
-    -------
-    >>> docs = cargar_documentos("data/documentos/corpus.txt")
-    >>> print(len(docs))
-    12
+    Carga los textos desde una ruta específica. 
+    Puede ser un archivo único .txt o una carpeta entera.
+    
+    Argumentos:
+        ruta_carpeta (str): Ruta al archivo o directorio.
+        
+    Retorna:
+        list[str]: Lista con el contenido de los documentos leídos.
     """
-    documentos = []
+    textos_cargados = []
 
     if os.path.isfile(ruta_carpeta) and ruta_carpeta.endswith(".txt"):
-        # Caso: es un archivo de texto directo (un documento por línea)
-        with open(ruta_carpeta, "r", encoding="utf-8") as archivo:
-            for linea in archivo:
-                linea = linea.strip()
-                if linea:  # Ignorar líneas vacías
-                    documentos.append(linea)
+        # Leemos archivo único, asumiendo una línea = un documento
+        with open(ruta_carpeta, "r", encoding="utf-8") as f:
+            for linea in f:
+                texto_limpio = linea.strip()
+                if texto_limpio:
+                    textos_cargados.append(texto_limpio)
+                    
     elif os.path.isdir(ruta_carpeta):
-        # Caso: es una carpeta con múltiples archivos .txt
-        archivos = sorted(os.listdir(ruta_carpeta))
-        for nombre_archivo in archivos:
-            if nombre_archivo.endswith(".txt"):
-                ruta_completa = os.path.join(ruta_carpeta, nombre_archivo)
-                with open(ruta_completa, "r", encoding="utf-8") as archivo:
-                    contenido = archivo.read().strip()
+        # Leemos todos los txt en la carpeta
+        lista_archivos = sorted(os.listdir(ruta_carpeta))
+        for nombre in lista_archivos:
+            if nombre.endswith(".txt"):
+                ruta_entera = os.path.join(ruta_carpeta, nombre)
+                with open(ruta_entera, "r", encoding="utf-8") as f:
+                    contenido = f.read().strip()
                     if contenido:
-                        documentos.append(contenido)
+                        textos_cargados.append(contenido)
     else:
-        raise FileNotFoundError(
-            f"No se encontró el archivo o carpeta: {ruta_carpeta}"
-        )
+        raise FileNotFoundError(f"Ruta no válida o inexistente: {ruta_carpeta}")
 
-    if not documentos:
-        raise ValueError(
-            f"No se encontraron documentos en: {ruta_carpeta}"
-        )
+    if not textos_cargados:
+        raise ValueError(f"No se encontró contenido válido en: {ruta_carpeta}")
 
-    return documentos
-
+    return textos_cargados
 
 def limpiar_texto(texto):
     """
-    Limpia un texto eliminando caracteres no deseados y normalizándolo.
-
-    Proceso de limpieza:
-    1. Convierte a minúsculas para uniformidad.
-    2. Elimina signos de puntuación y caracteres especiales con regex.
-    3. Colapsa espacios múltiples en uno solo.
-
-    Se usa re.sub() con el patrón [^a-záéíóúüñ\\s] que conserva solo
-    letras del alfabeto español y espacios. Esto es más eficiente que
-    iterar carácter por carácter con un bucle for.
-
-    Parámetros
-    ----------
-    texto : str
-        Texto en bruto a limpiar.
-
-    Retorna
-    -------
-    str
-        Texto limpio, en minúsculas, sin puntuación.
-
-    Ejemplo
-    -------
-    >>> limpiar_texto("¡Hola, Mundo! ¿Cómo estás?")
-    'hola mundo cómo estás'
+    Aplica normalización al texto bruto.
+    - Pasa todo a minúsculas.
+    - Quita caracteres especiales y puntuación.
+    - Elimina espacios sobrantes.
     """
-    # Paso 1: Convertir a minúsculas
-    texto = texto.lower()
-
-    # Paso 2: Eliminar todo lo que no sea letra (incluyendo acentos) o espacio
-    texto = re.sub(r"[^a-záéíóúüñ\s]", "", texto)
-
-    # Paso 3: Reducir espacios múltiples a uno solo
-    texto = re.sub(r"\s+", " ", texto).strip()
-
-    return texto
-
+    # Todo a minúscula
+    texto_min = texto.lower()
+    
+    # Mantener solo letras del abecedario español y espacios
+    texto_filtrado = re.sub(r"[^a-záéíóúüñ\s]", "", texto_min)
+    
+    # Quitar dobles espacios o más
+    texto_final = re.sub(r"\s+", " ", texto_filtrado).strip()
+    
+    return texto_final
 
 def tokenizar(texto):
     """
-    Separa un texto limpio en una lista de palabras individuales (tokens).
-
-    Se usa split() de Python que divide por espacios en blanco. Este método
-    es O(n) en tiempo y no requiere librerías externas como NLTK o spaCy.
-
-    Parámetros
-    ----------
-    texto : str
-        Texto previamente limpiado con limpiar_texto().
-
-    Retorna
-    -------
-    list[str]
-        Lista de palabras (tokens).
-
-    Ejemplo
-    -------
-    >>> tokenizar("hola mundo cómo estás")
-    ['hola', 'mundo', 'cómo', 'estás']
+    Divide un texto (previamente limpiado) en una lista de palabras.
+    Uso split(), que corta usando los espacios en blanco.
     """
     return texto.split()
 
-
 def remover_stopwords(tokens):
     """
-    Elimina palabras vacías (stopwords) de una lista de tokens.
-
-    Las stopwords son palabras funcionales del idioma que no aportan
-    significado semántico (artículos, preposiciones, conjunciones).
-    Removerlas reduce la dimensionalidad del espacio vectorial y mejora
-    la calidad de las similitudes calculadas.
-
-    Se usa una búsqueda O(1) en un set (STOPWORDS_ES) en lugar de una
-    lista, lo que hace la operación eficiente incluso con vocabularios
-    grandes.
-
-    Parámetros
-    ----------
-    tokens : list[str]
-        Lista de palabras tokenizadas.
-
-    Retorna
-    -------
-    list[str]
-        Lista filtrada sin stopwords.
-
-    Ejemplo
-    -------
-    >>> remover_stopwords(["la", "inteligencia", "artificial", "es", "genial"])
-    ['inteligencia', 'artificial', 'genial']
+    Filtra los tokens quitando las palabras vacías definidas arriba.
+    Usamos un set para que la búsqueda sea rápida (O(1)).
     """
-    return [token for token in tokens if token not in STOPWORDS_ES]
-
+    tokens_utiles = [t for t in tokens if t not in PALABRAS_VACIAS_ES]
+    return tokens_utiles
 
 def preprocesar_documento(texto):
     """
-    Aplica el pipeline completo de preprocesamiento a un documento.
-
-    Pipeline: texto bruto -> limpieza -> tokenización -> remoción de stopwords.
-
-    Parámetros
-    ----------
-    texto : str
-        Texto en bruto del documento.
-
-    Retorna
-    -------
-    list[str]
-        Lista de tokens limpios y filtrados.
+    Función envoltorio que aplica todos los pasos a un solo documento:
+    1. Limpieza
+    2. Tokenización
+    3. Remoción de stopwords
     """
-    texto_limpio = limpiar_texto(texto)
-    tokens = tokenizar(texto_limpio)
-    tokens_filtrados = remover_stopwords(tokens)
-    return tokens_filtrados
-
+    paso1 = limpiar_texto(texto)
+    paso2 = tokenizar(paso1)
+    paso3 = remover_stopwords(paso2)
+    return paso3
 
 def preprocesar_corpus(documentos):
     """
-    Aplica el pipeline de preprocesamiento a una lista de documentos.
-
-    Parámetros
-    ----------
-    documentos : list[str]
-        Lista de textos en bruto.
-
-    Retorna
-    -------
-    list[list[str]]
-        Lista de listas de tokens procesados, una por documento.
+    Procesa una lista completa de documentos aplicando
+    el pipeline de preprocesamiento a cada uno.
     """
-    return [preprocesar_documento(doc) for doc in documentos]
+    return [preprocesar_documento(d) for d in documentos]
