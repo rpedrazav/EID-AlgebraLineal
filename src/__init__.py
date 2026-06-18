@@ -18,8 +18,8 @@ from src.vectorizacion import (
     obtener_vocabulario_inverso,
 )
 from src.similitud import (
-    calcular_producto_punto,
-    calcular_norma,
+    producto_punto,
+    norma_euclidiana,
     similitud_coseno,
 )
 from src.buscador import BuscadorSemantico
