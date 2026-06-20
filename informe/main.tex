@@ -83,115 +83,15 @@
 \newpage
 
 % =============================================================================
+% =============================================================================
 % SECCIÓN I — Marco Teórico
 % =============================================================================
-\section{Marco Teórico}
-% Responsable: Seba (Sección I — Espacios Vectoriales) + Dani (Similitud Coseno)
-% Estado: Borrador inicial generado a partir del código implementado.
-%         Seba y Dani deben revisar, personalizar y expandir.
-
-\subsection{Espacios Vectoriales de Texto}
-
-En el contexto de la recuperación de información, los documentos de texto se representan como vectores numéricos dentro de un \textbf{espacio vectorial}. La idea fundamental es transformar cada documento en un punto de $\mathbb{R}^n$, donde $n$ corresponde al número de términos únicos (vocabulario) del corpus.
-
-\subsubsection{Representación vectorial de documentos}
-
-Cada documento $d_i$ se representa como un vector de frecuencias:
-\[
-\vec{d_i} = (f_{i,1},\ f_{i,2},\ \ldots,\ f_{i,n}) \in \mathbb{R}^n
-\]
-donde $f_{i,j}$ es la frecuencia del término $j$ en el documento $i$. Este modelo se denomina \textbf{Bag-of-Words} (bolsa de palabras), ya que ignora el orden de las palabras y solo retiene cuántas veces aparece cada una.
-
-\subsubsection{Dimensión del espacio vectorial}
-
-La dimensión del espacio está determinada por el \textbf{tamaño del vocabulario}: el conjunto de todas las palabras únicas que aparecen en el corpus tras el preprocesamiento. En nuestra implementación, el corpus de 12 documentos genera un vocabulario de 154 términos únicos, por lo que cada documento es un vector en $\mathbb{R}^{154}$.
-
-\subsubsection{Interpretación geométrica}
-
-Dos documentos que tratan temas similares comparten más términos en común, lo que significa que sus vectores apuntan en direcciones parecidas dentro del espacio vectorial. La ``cercanía'' entre documentos no se mide por distancia euclidiana (que es sensible a la longitud del texto), sino por el \textbf{ángulo} entre sus vectores, como se detalla en la siguiente subsección.
-
-\subsection{Similitud Coseno}
-
-La similitud coseno mide la semejanza entre dos vectores a través del coseno del ángulo que forman, independientemente de su magnitud:
-
-\begin{equation}
-\cos(\theta) = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \cdot \|\vec{v}\|} = \frac{\displaystyle\sum_{i=1}^{n} u_i \cdot v_i}{\sqrt{\displaystyle\sum_{i=1}^{n} u_i^2} \cdot \sqrt{\displaystyle\sum_{i=1}^{n} v_i^2}}
-\label{eq:coseno}
-\end{equation}
-
-\begin{itemize}
-    \item Si $\cos(\theta) = 1$: los vectores apuntan en la misma dirección (documentos idénticos en distribución de términos).
-    \item Si $\cos(\theta) = 0$: los vectores son ortogonales (no comparten ningún término).
-    \item Para vectores de frecuencia (no negativos), $\cos(\theta) \in [0, 1]$.
-\end{itemize}
-
-\subsubsection{Ejemplo matemático simple}
-
-Consideremos dos frases breves como documentos, con un vocabulario simplificado de 4 términos: \{``inteligencia'', ``artificial'', ``aprendizaje'', ``datos''\}.
-
-\begin{itemize}
-    \item \textbf{Frase A:} ``la inteligencia artificial utiliza aprendizaje'' $\rightarrow \vec{a} = (1, 1, 1, 0)$
-    \item \textbf{Frase B:} ``el aprendizaje de datos e inteligencia'' $\rightarrow \vec{b} = (1, 0, 1, 1)$
-\end{itemize}
-
-\paragraph{Paso 1 — Producto punto:}
-\[
-\vec{a} \cdot \vec{b} = (1)(1) + (1)(0) + (1)(1) + (0)(1) = 2
-\]
-
-\paragraph{Paso 2 — Normas:}
-\[
-\|\vec{a}\| = \sqrt{1^2 + 1^2 + 1^2 + 0^2} = \sqrt{3} \approx 1.732
-\]
-\[
-\|\vec{b}\| = \sqrt{1^2 + 0^2 + 1^2 + 1^2} = \sqrt{3} \approx 1.732
-\]
-
-\paragraph{Paso 3 — Similitud coseno:}
-\[
-\cos(\theta) = \frac{2}{\sqrt{3} \cdot \sqrt{3}} = \frac{2}{3} \approx 0.667
-\]
-
-\paragraph{Interpretación:} Una similitud de 0.667 indica que las frases comparten una proporción significativa de vocabulario (``inteligencia'' y ``aprendizaje''), lo que sugiere relación temática. La frase A incluye ``artificial'' (ausente en B) y la frase B incluye ``datos'' (ausente en A), lo que impide una similitud de 1.0.
+\input{seccion_I_marco_teorico}
 
 % =============================================================================
 % SECCIÓN II — Representación de Documentos
 % =============================================================================
-\section{Representación de Documentos}
-% Responsable: Seba
-% Estado: Borrador inicial. Seba debe revisar y personalizar.
-
-\subsection{Pipeline de preprocesamiento}
-
-Antes de convertir los documentos en vectores, cada texto pasa por un pipeline de limpieza implementado en \texttt{src/preprocesamiento.py}:
-
-\begin{enumerate}
-    \item \textbf{Normalización:} conversión a minúsculas para eliminar diferencias como ``Datos'' vs. ``datos''.
-    \item \textbf{Limpieza:} eliminación de signos de puntuación y caracteres especiales mediante expresiones regulares, conservando únicamente letras del alfabeto español y espacios.
-    \item \textbf{Tokenización:} separación del texto en palabras individuales (\textit{tokens}).
-    \item \textbf{Remoción de stopwords:} eliminación de palabras funcionales (artículos, preposiciones, conjunciones) que no aportan contenido semántico. Se utiliza una lista propia de 75 palabras vacías en español definida en la constante \texttt{PALABRAS\_VACIAS\_ES}.
-\end{enumerate}
-
-\subsection{Construcción de la Matriz Documento-Término}
-
-La vectorización, implementada en \texttt{src/vectorizacion.py}, consta de dos pasos:
-
-\subsubsection{Vocabulario}
-Se recorren todos los documentos preprocesados para extraer el conjunto de términos únicos, ordenados alfabéticamente. Cada término recibe un índice entero que define su posición como columna en la matriz.
-
-\subsubsection{Matriz de frecuencias}
-Se construye una matriz $M \in \mathbb{R}^{m \times n}$ donde $m = 12$ (documentos) y $n = 154$ (términos del vocabulario):
-\[
-M_{ij} = \text{frecuencia del término } j \text{ en el documento } i
-\]
-
-\subsection{Sparsidad de la matriz}
-
-La sparsidad medida fue del \textbf{89.8\%}, lo que significa que el 89.8\% de las celdas de la matriz contienen el valor 0. Esto es típico del modelo Bag-of-Words: cada documento breve utiliza solo una fracción del vocabulario total. Una matriz \textit{rala} (sparse) tiene implicaciones para la eficiencia computacional y para la calidad de las similitudes calculadas.
-
-\subsection{Corpus utilizado}
-
-El corpus consta de 12 documentos breves sobre temas de Ciencias de la Computación, almacenados en \texttt{data/documentos/corpus.txt} (una línea por documento). Los temas abarcan: Inteligencia Artificial, Redes Neuronales, Aprendizaje Automático, Ciberseguridad, Sistemas Operativos, Computación en la Nube, Desarrollo de Software, Bases de Datos, Programación OO, Algoritmos, PLN y Robótica.
+\input{seccion_II_representacion}
 
 % =============================================================================
 % SECCIÓN III — Implementación Computacional

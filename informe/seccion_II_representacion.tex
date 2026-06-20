@@ -1,0 +1,119 @@
+% =============================================================================
+% Sección II — Representación de Documentos
+% =============================================================================
+\section{Representación de Documentos}
+% Responsable: Seba
+
+\subsection{Corpus utilizado}
+
+El punto de partida del sistema es el corpus de texto. Para este proyecto se seleccionaron \textbf{12 documentos breves} en español, cada uno cubriendo un tema diferente dentro de las Ciencias de la Computación. Los documentos se almacenan en \texttt{data/documentos/corpus.txt}, con el formato de una oración por línea, lo que simplifica su carga y permite que \texttt{cargar\_documentos()} los trate como 12 entidades independientes.
+
+\begin{table}[H]
+\centering
+\caption{Corpus de 12 documentos seleccionados para el proyecto.}
+\label{tab:corpus}
+\begin{tabular}{|c|l|}
+\hline
+\textbf{ID} & \textbf{Tema del documento} \\
+\hline
+Doc 1  & Inteligencia Artificial \\
+Doc 2  & Redes Neuronales Artificiales \\
+Doc 3  & Aprendizaje Automático (Machine Learning) \\
+Doc 4  & Ciberseguridad \\
+Doc 5  & Sistemas Operativos \\
+Doc 6  & Computación en la Nube \\
+Doc 7  & Desarrollo de Software \\
+Doc 8  & Bases de Datos Relacionales \\
+Doc 9  & Programación Orientada a Objetos \\
+Doc 10 & Algoritmos de Búsqueda y Ordenamiento \\
+Doc 11 & Procesamiento del Lenguaje Natural \\
+Doc 12 & Robótica \\
+\hline
+\end{tabular}
+\end{table}
+
+La diversidad temática del corpus es intencional: al cubrir áreas distintas de la computación, los vectores de los documentos deberían ser en su mayoría ortogonales entre sí, salvo entre documentos relacionados (como Doc~1, Doc~3 y Doc~11, que comparten el ámbito de la Inteligencia Artificial). Esto permite evaluar la capacidad del buscador para discriminar entre temas.
+
+\subsection{Pipeline de preprocesamiento}
+
+Antes de vectorizar, cada texto bruto pasa por un pipeline de limpieza implementado en \texttt{src/preprocesamiento.py}. Este pipeline es fundamental: sin él, palabras como ``Inteligencia'' e ``inteligencia'' serían tratadas como términos distintos, inflando el vocabulario innecesariamente.
+
+\begin{enumerate}
+    \item \textbf{Normalización a minúsculas} (\texttt{limpiar\_texto}): todas las letras se convierten a minúscula. Esto garantiza que ``Datos'', ``DATOS'' y ``datos'' se traten como el mismo término.
+    
+    \item \textbf{Limpieza de caracteres} (\texttt{limpiar\_texto}): se eliminan signos de puntuación, números y caracteres especiales mediante la expresión regular \texttt{[\^{}a-záéíóúüñ\textbackslash{}s]}, que conserva únicamente letras del alfabeto español (incluyendo vocales acentuadas y la ñ) y espacios en blanco.
+    
+    \item \textbf{Tokenización} (\texttt{tokenizar}): el texto limpio se divide en palabras individuales usando \texttt{str.split()}, que separa por espacios en blanco. Esta es la opción adecuada para el modelo Bag-of-Words, donde no se requiere análisis morfológico.
+    
+    \item \textbf{Remoción de stopwords} (\texttt{remover\_stopwords}): se eliminan las palabras vacías (artículos, preposiciones, conjunciones) que no aportan contenido semántico. Se utiliza la constante \texttt{PALABRAS\_VACIAS\_ES}, un conjunto (\textit{set}) de 75 palabras funcionales del español definido en el propio módulo. El uso de \textit{set} en vez de lista reduce la búsqueda de $O(n)$ a $O(1)$, lo cual es relevante cuando se procesan miles de tokens.
+\end{enumerate}
+
+Ejemplo del pipeline aplicado al primer documento:
+
+\begin{itemize}
+    \item \textbf{Texto original:} ``La inteligencia artificial es una rama de la informática que busca crear sistemas capaces de realizar tareas que normalmente requieren inteligencia humana...''
+    \item \textbf{Tokens resultantes:} \texttt{[`inteligencia', `artificial', `rama', `informática', `busca', `crear', `sistemas', `capaces', `realizar', `tareas', `normalmente', `requieren', `inteligencia', `humana', `reconocimiento', `voz', `toma', `decisiones']}
+\end{itemize}
+
+El preprocesamiento redujo el documento de $\approx$30 palabras a 18 tokens útiles, eliminando artículos y preposiciones que solo añadirían ruido al vector.
+
+\subsection{Construcción de la Matriz Documento-Término}
+
+\subsubsection{Vocabulario generado}
+
+La función \texttt{construir\_vocabulario()} recorre los 12 documentos preprocesados y extrae todos los términos únicos, ordenándolos alfabéticamente. Este ordenamiento no es arbitrario: garantiza que ante el mismo corpus, el vocabulario generado sea siempre idéntico, haciendo la representación vectorial \textbf{reproducible y determinista}.
+
+El corpus completo, tras el preprocesamiento, produjo un vocabulario de \textbf{154 términos únicos}, con un total de 193 tokens (contando repeticiones). Esto significa que, en promedio, cada documento contiene $193 / 12 \approx 16$ tokens útiles.
+
+\subsubsection{Construcción de la matriz}
+
+La función \texttt{crear\_matriz\_documento\_termino()} construye la matriz $M \in \mathbb{R}^{12 \times 154}$ donde:
+\[
+M_{ij} = \text{número de veces que aparece el término } t_j \text{ en el documento } d_i
+\]
+
+La implementación parte de una matriz de ceros de tipo \texttt{numpy.float64} y recorre cada documento una sola vez para incrementar el contador de cada término encontrado. El uso de \texttt{float64} (en lugar de enteros) es una decisión de diseño deliberada: permite que la misma matriz soporte en el futuro esquemas de ponderación como TF-IDF, que producen valores decimales, sin necesidad de cambiar la estructura de datos.
+
+La Tabla~\ref{tab:matriz_ejemplo} muestra un subconjunto reducido de la matriz real (4 documentos × 6 términos seleccionados) para ilustrar la estructura:
+
+\begin{table}[H]
+\centering
+\caption{Submatriz ejemplo: 4 documentos × 6 términos representativos.}
+\label{tab:matriz_ejemplo}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Documento} & \texttt{artificial} & \texttt{aprendizaje} & \texttt{bases} & \texttt{datos} & \texttt{inteligencia} & \texttt{sistemas} \\
+\hline
+Doc 1 (IA)            & 1 & 0 & 0 & 0 & 2 & 1 \\
+Doc 3 (ML)            & 1 & 1 & 0 & 0 & 1 & 1 \\
+Doc 8 (BD)            & 0 & 0 & 1 & 2 & 0 & 0 \\
+Doc 12 (Robótica)     & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline
+\end{tabular}
+\end{table}
+
+Obsérvese cómo Doc~1 y Doc~3 comparten los términos ``artificial'', ``inteligencia'' y ``sistemas'', mientras que Doc~8 se orienta exclusivamente hacia ``bases'' y ``datos''. Doc~12, al hablar de robótica, no comparte ninguno de estos 6 términos, por lo que toda su fila es cero en esta submatriz.
+
+\subsection{Sparsidad de la Matriz Documento-Término}
+
+Una característica estructural inevitable del modelo Bag-of-Words sobre corpus de texto real es la \textbf{sparsidad}: la gran mayoría de las celdas de la matriz tendrán valor 0, porque cada documento utiliza solo una fracción pequeña del vocabulario total.
+
+Formalmente, la sparsidad se define como:
+\[
+\text{sparsidad} = \frac{\text{número de celdas con valor } 0}{m \times n} \times 100\%
+\]
+
+En nuestra implementación:
+\[
+\text{sparsidad} = \frac{12 \times 154 - 193}{12 \times 154} \times 100\% = \frac{1{,}655}{1{,}848} \times 100\% \approx \mathbf{89.8\%}
+\]
+
+Esto significa que \textbf{casi 9 de cada 10 celdas} de la Matriz Documento-Término contienen un 0, lo cual es completamente esperable y correcto:
+
+\begin{itemize}
+    \item Cada documento breve usa aproximadamente 16 términos únicos de un vocabulario de 154.
+    \item Un documento sobre Robótica no menciona términos de Bases de Datos, y viceversa.
+    \item La sparsidad es una consecuencia directa de la \textbf{especificidad temática} de los documentos.
+\end{itemize}
+
+Desde el punto de vista computacional, la sparsidad tiene implicaciones importantes: si el corpus creciera a miles de documentos con un vocabulario de decenas de miles de términos, almacenar la matriz densa en memoria sería ineficiente. Para esos casos, existen representaciones compactas (matrices esparsas de \texttt{scipy.sparse}) que solo almacenan los valores no nulos, reduciendo el uso de memoria en proporción a la sparsidad. En nuestro caso, con 12 documentos y 154 términos, la matriz densa de \texttt{numpy} es perfectamente adecuada.

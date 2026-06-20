@@ -1,0 +1,115 @@
+% =============================================================================
+% Sección I — Marco Teórico
+% =============================================================================
+\section{Marco Teórico}
+% Responsable: Seba (Sección I — Espacios Vectoriales) + Dani (Similitud Coseno)
+
+\subsection{Espacios Vectoriales de Texto}
+
+Para que una computadora pueda procesar y comparar textos, es necesario transformar el lenguaje humano en estructuras matemáticas. La herramienta fundamental para esto es el \textbf{espacio vectorial}: un espacio matemático donde cada documento de texto se representa como un vector numérico, y donde las relaciones entre documentos pueden medirse mediante operaciones del álgebra lineal.
+
+\subsubsection{Representación numérica de texto}
+
+El proceso de transformación texto $\rightarrow$ vector se basa en el modelo \textbf{Bag-of-Words} (Bolsa de Palabras). La idea central es:
+
+\begin{enumerate}
+    \item Se define un \textbf{vocabulario} $V = \{t_1, t_2, \ldots, t_n\}$: el conjunto ordenado de todos los términos únicos del corpus, una vez realizado el preprocesamiento (limpieza, tokenización y remoción de stopwords).
+    \item Cada documento $d_i$ se convierte en un vector de $n$ componentes:
+    \[
+    \vec{d_i} = (f_{i,1},\ f_{i,2},\ \ldots,\ f_{i,n}) \in \mathbb{R}^n
+    \]
+    donde $f_{i,j}$ es la frecuencia (cantidad de veces que aparece) del término $t_j$ en el documento $d_i$.
+\end{enumerate}
+
+Este modelo se llama ``Bag-of-Words'' porque \textbf{ignora el orden de las palabras} y solo conserva cuántas veces aparece cada una, como si el texto fuera una bolsa mezclada de palabras.
+
+\subsubsection{Dimensión del espacio vectorial}
+
+La dimensión del espacio vectorial está determinada por el \textbf{tamaño del vocabulario} $|V| = n$. Esto es crucial: a mayor cantidad de términos únicos en el corpus, mayor es la dimensión del espacio en que viven los documentos.
+
+En nuestra implementación:
+\begin{itemize}
+    \item El corpus contiene \textbf{12 documentos} sobre temas de Ciencias de la Computación.
+    \item Tras el preprocesamiento, se obtienen \textbf{154 términos únicos}.
+    \item Por lo tanto, cada documento es un vector en $\mathbb{R}^{154}$.
+\end{itemize}
+
+La Tabla~\ref{tab:vocab_muestra} muestra los primeros 10 términos del vocabulario generado por \texttt{construir\_vocabulario()}, ordenados alfabéticamente para garantizar reproducibilidad:
+
+\begin{table}[H]
+\centering
+\caption{Muestra de los primeros 10 términos del vocabulario (de 154 en total).}
+\label{tab:vocab_muestra}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Índice} & \textbf{Término} \\
+\hline
+0  & acceder \\
+1  & accesos \\
+2  & algoritmos \\
+3  & almacenamiento \\
+4  & análisis \\
+5  & aplicaciones \\
+6  & aprender \\
+7  & aprendizaje \\
+8  & artificial \\
+9  & artificiales \\
+\hline
+\end{tabular}
+\end{table}
+
+Cada índice corresponde a una columna en la Matriz Documento-Término. Así, la posición de la componente $f_{i,j}$ en el vector del documento $i$ queda determinada unívocamente por el vocabulario.
+
+\subsubsection{Interpretación geométrica}
+
+Representar documentos como vectores en $\mathbb{R}^n$ nos permite razonar geométricamente sobre sus relaciones:
+
+\begin{itemize}
+    \item Dos documentos que tratan el mismo tema comparten muchos términos. Sus vectores tendrán valores no nulos en las mismas posiciones, por lo que \textbf{apuntarán en direcciones similares} dentro del espacio $\mathbb{R}^{154}$.
+    \item Dos documentos de temas completamente distintos no comparten vocabulario. Sus vectores serán casi \textbf{ortogonales} (perpendiculares), con un ángulo cercano a $90°$.
+    \item La magnitud (longitud) del vector depende de la extensión del documento, no de su contenido. Por esto, la similitud entre documentos \textbf{no se mide por distancia euclidiana} (que penalizaría a los documentos más largos), sino por el \textbf{ángulo} entre sus vectores, definido mediante la similitud coseno descrita en la siguiente subsección.
+\end{itemize}
+
+\subsection{Similitud Coseno}
+
+La similitud coseno mide la semejanza entre dos vectores a través del coseno del ángulo que forman, independientemente de su magnitud:
+
+\begin{equation}
+\cos(\theta) = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \cdot \|\vec{v}\|} = \frac{\displaystyle\sum_{i=1}^{n} u_i \cdot v_i}{\sqrt{\displaystyle\sum_{i=1}^{n} u_i^2} \cdot \sqrt{\displaystyle\sum_{i=1}^{n} v_i^2}}
+\label{eq:coseno}
+\end{equation}
+
+\begin{itemize}
+    \item Si $\cos(\theta) = 1$: los vectores apuntan en la misma dirección (documentos idénticos en distribución de términos).
+    \item Si $\cos(\theta) = 0$: los vectores son ortogonales (no comparten ningún término).
+    \item Para vectores de frecuencia (no negativos), $\cos(\theta) \in [0, 1]$.
+\end{itemize}
+
+\subsubsection{Ejemplo matemático simple}
+
+Consideremos dos frases breves como documentos, con un vocabulario simplificado de 4 términos: \{``inteligencia'', ``artificial'', ``aprendizaje'', ``datos''\}.
+
+\begin{itemize}
+    \item \textbf{Frase A:} ``la inteligencia artificial utiliza aprendizaje'' $\rightarrow \vec{a} = (1, 1, 1, 0)$
+    \item \textbf{Frase B:} ``el aprendizaje de datos e inteligencia'' $\rightarrow \vec{b} = (1, 0, 1, 1)$
+\end{itemize}
+
+\paragraph{Paso 1 — Producto punto:}
+\[
+\vec{a} \cdot \vec{b} = (1)(1) + (1)(0) + (1)(1) + (0)(1) = 2
+\]
+
+\paragraph{Paso 2 — Normas:}
+\[
+\|\vec{a}\| = \sqrt{1^2 + 1^2 + 1^2 + 0^2} = \sqrt{3} \approx 1.732
+\]
+\[
+\|\vec{b}\| = \sqrt{1^2 + 0^2 + 1^2 + 1^2} = \sqrt{3} \approx 1.732
+\]
+
+\paragraph{Paso 3 — Similitud coseno:}
+\[
+\cos(\theta) = \frac{2}{\sqrt{3} \cdot \sqrt{3}} = \frac{2}{3} \approx 0.667
+\]
+
+\paragraph{Interpretación:} Una similitud de 0.667 indica que las frases comparten una proporción significativa de vocabulario (``inteligencia'' y ``aprendizaje''), lo que sugiere relación temática. La frase A incluye ``artificial'' (ausente en B) y la frase B incluye ``datos'' (ausente en A), lo que impide una similitud de 1.0.
