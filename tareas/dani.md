@@ -30,14 +30,14 @@ Con estos datos de prueba, puedes programar todo tu código (`similitud.py` y `b
 
 ## Tareas del Informe (`informe/`)
 
-- [ ] **Redactar Sección I (Marco Teórico) - Similitud Coseno**:
-  - [ ] Explicar qué es la similitud coseno y cómo se usa para comparar textos.
-  - [ ] Explicar su interpretación geométrica (el ángulo entre dos vectores independientemente de su magnitud).
-- [ ] **Desarrollar el Ejemplo Matemático Simple (Obligatorio en Sección I)**:
-  - [ ] Inventar dos textos (o frases cortas) representados como vectores.
-  - [ ] Mostrar paso a paso el cálculo manual: representación vectorial, cálculo de producto punto, cálculo de normas, resultado final de la similitud coseno y su interpretación.
-- [ ] **Redactar apertura de la Sección III (Implementación Computacional - Punto III.A.1)**:
-  - [ ] **Importante:** Escribir la subsección introductoria de la Sección III explicando *específicamente cómo el álgebra lineal permite comparar documentos mediante operaciones vectoriales para la recuperación de información*. Esta sección une tu conocimiento matemático con el código.
+- [x] **Redactar Sección I (Marco Teórico) - Similitud Coseno**:
+  - [x] Explicar qué es la similitud coseno y cómo se usa para comparar textos.
+  - [x] Explicar su interpretación geométrica (el ángulo entre dos vectores independientemente de su magnitud).
+- [x] **Desarrollar el Ejemplo Matemático Simple (Obligatorio en Sección I)**:
+  - [x] Inventar dos textos (o frases cortas) representados como vectores.
+  - [x] Mostrar paso a paso el cálculo manual: representación vectorial, cálculo de producto punto, cálculo de normas, resultado final de la similitud coseno y su interpretación.
+- [x] **Redactar apertura de la Sección III (Implementación Computacional - Punto III.A.1)**:
+  - [x] **Importante:** Escribir la subsección introductoria de la Sección III explicando *específicamente cómo el álgebra lineal permite comparar documentos mediante operaciones vectoriales para la recuperación de información*. Esta sección une tu conocimiento matemático con el código.
 
 ## Tareas de la Presentación
 

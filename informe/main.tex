@@ -96,44 +96,6 @@
 % =============================================================================
 % SECCIÓN III — Implementación Computacional
 % =============================================================================
-\section{Implementación Computacional}
-
-\subsection{Álgebra lineal y operaciones vectoriales para recuperación de información}
-% Responsable: Dani (III.A.1)
-% Estado: Borrador inicial basado en similitud.py y buscador.py de Dani.
-%         Dani debe revisar, personalizar y expandir.
-
-La recuperación de información basada en vectores se apoya en tres operaciones fundamentales del álgebra lineal, implementadas en \texttt{src/similitud.py}:
-
-\begin{enumerate}
-    \item \textbf{Producto punto} (\texttt{producto\_punto(u, v)}): calcula $\vec{u} \cdot \vec{v} = \sum_{i=1}^{n} u_i v_i$ mediante \texttt{numpy.dot()}, que ejecuta la operación en código compilado C, logrando tiempos $O(n)$ significativamente menores que un bucle Python equivalente.
-
-    \item \textbf{Norma euclidiana} (\texttt{norma\_euclidiana(vector)}): calcula $\|\vec{v}\| = \sqrt{\sum_{i=1}^{n} v_i^2}$ mediante \texttt{numpy.linalg.norm()}.
-
-    \item \textbf{Similitud coseno} (\texttt{similitud\_coseno(u, v)}): aplica la Ecuación~\ref{eq:coseno}. Se incorpora una tolerancia numérica $\varepsilon = 10^{-12}$ para evitar la división entre cero cuando algún vector tiene norma nula (documento sin términos del vocabulario o consulta sin coincidencias).
-\end{enumerate}
-
-\subsubsection{Motor de búsqueda}
-
-La clase \texttt{BuscadorSemantico} (\texttt{src/buscador.py}) encapsula el proceso de búsqueda:
-
-\begin{enumerate}
-    \item \textbf{Vectorización de la consulta:} el texto de búsqueda pasa por el mismo pipeline de preprocesamiento que los documentos y se convierte en un vector de frecuencias usando el vocabulario existente. Términos de la consulta que no existen en el vocabulario se ignoran.
-
-    \item \textbf{Cálculo de similitudes:} se computa la similitud coseno entre el vector consulta $\vec{q}$ y cada fila $\vec{d_i}$ de la Matriz Documento-Término. La implementación utiliza multiplicación matricial vectorizada ($M \cdot \vec{q}$) para calcular todos los productos punto simultáneamente, evitando un bucle explícito.
-
-    \item \textbf{Ranking:} los documentos se ordenan de mayor a menor similitud mediante \texttt{numpy.argsort()}, retornando los top-$k$ resultados.
-\end{enumerate}
-
-\subsubsection{Optimización: Matriz de similitud pre-computada}
-
-Para generar el mapa de calor entre todos los documentos, se implementó un cálculo vectorizado de la matriz de similitudes completa:
-\[
-S = \hat{M} \cdot \hat{M}^T
-\]
-donde $\hat{M}$ es la matriz con filas normalizadas ($\hat{d_i} = \vec{d_i} / \|\vec{d_i}\|$). Cada celda $S_{ij} = \cos(\theta_{ij})$ se obtiene en una sola operación matricial, lo cual es significativamente más eficiente que calcular las $\binom{m}{2}$ similitudes individualmente.
-
-% ─── Sección de Renato: Análisis Experimental ───────────────────────────────
 \input{seccion_III_analisis}
 
 % =============================================================================

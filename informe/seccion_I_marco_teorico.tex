@@ -72,44 +72,112 @@ Representar documentos como vectores en $\mathbb{R}^n$ nos permite razonar geom�
 
 \subsection{Similitud Coseno}
 
-La similitud coseno mide la semejanza entre dos vectores a través del coseno del ángulo que forman, independientemente de su magnitud:
+\subsubsection{Fundamento teórico}
+
+Cuando dos documentos se representan como vectores de frecuencias en $\mathbb{R}^n$, medir su semejanza implica encontrar una métrica que capture el contenido compartido sin penalizar las diferencias de longitud. La \textbf{similitud coseno} responde exactamente a esta necesidad: cuantifica la semejanza entre dos vectores $\vec{u}, \vec{v} \in \mathbb{R}^n$ mediante el coseno del ángulo $\theta$ que forman en el espacio vectorial, independientemente de sus magnitudes.
+
+Formalmente, a partir del producto punto $\vec{u} \cdot \vec{v} = \|\vec{u}\|\,\|\vec{v}\|\cos(\theta)$, despejando el coseno se obtiene:
 
 \begin{equation}
-\cos(\theta) = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \cdot \|\vec{v}\|} = \frac{\displaystyle\sum_{i=1}^{n} u_i \cdot v_i}{\sqrt{\displaystyle\sum_{i=1}^{n} u_i^2} \cdot \sqrt{\displaystyle\sum_{i=1}^{n} v_i^2}}
+\text{sim}(\vec{u}, \vec{v}) = \cos(\theta) = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \cdot \|\vec{v}\|} = \frac{\displaystyle\sum_{i=1}^{n} u_i v_i}{\sqrt{\displaystyle\sum_{i=1}^{n} u_i^2} \cdot \sqrt{\displaystyle\sum_{i=1}^{n} v_i^2}}
 \label{eq:coseno}
 \end{equation}
 
+donde $\|\vec{u}\| = \sqrt{\vec{u}\cdot\vec{u}}$ es la norma euclidiana (o norma-2) del vector $\vec{u}$, que representa la longitud o magnitud del vector en el espacio.
+
+Dado que los vectores de frecuencias solo tienen componentes no negativas ($u_i, v_i \geq 0$), el producto punto también es no negativo, por lo que:
+\[
+\cos(\theta) \in [0,\, 1] \quad \text{para vectores de texto en el modelo Bag-of-Words.}
+\]
+
+Los casos extremos tienen una interpretación precisa:
 \begin{itemize}
-    \item Si $\cos(\theta) = 1$: los vectores apuntan en la misma dirección (documentos idénticos en distribución de términos).
-    \item Si $\cos(\theta) = 0$: los vectores son ortogonales (no comparten ningún término).
-    \item Para vectores de frecuencia (no negativos), $\cos(\theta) \in [0, 1]$.
+    \item $\cos(\theta) = 1$ ($\theta = 0°$): los vectores son colineales, es decir, apuntan exactamente en la misma dirección. En el contexto textual, esto significa que los dos documentos tienen exactamente la misma distribución proporcional de términos, independientemente de si uno es más extenso que el otro.
+    \item $\cos(\theta) = 0$ ($\theta = 90°$): los vectores son ortogonales. Los dos documentos no comparten ni un solo término del vocabulario; su intersección léxica es vacía.
+    \item $0 < \cos(\theta) < 1$: existe un grado parcial de relación temática, proporcional al vocabulario compartido.
 \end{itemize}
 
-\subsubsection{Ejemplo matemático simple}
+\subsubsection{Uso para comparar texto: por qué el ángulo y no la distancia}
 
-Consideremos dos frases breves como documentos, con un vocabulario simplificado de 4 términos: \{``inteligencia'', ``artificial'', ``aprendizaje'', ``datos''\}.
+Una alternativa natural para medir semejanza entre vectores sería la \textbf{distancia euclidiana}:
+\[
+ d(\vec{u}, \vec{v}) = \|\vec{u} - \vec{v}\| = \sqrt{\sum_{i=1}^{n}(u_i - v_i)^2}
+\]
+Sin embargo, esta métrica presenta un problema crítico en el contexto textual: es \textbf{sensible a la magnitud}. Un documento que repite todas sus palabras dos veces produce un vector con el doble de componentes, pero su contenido semántico es idéntico. La distancia euclidiana entre ese documento duplicado y el original sería grande, mientras que la similitud coseno entre ambos sería exactamente 1, porque sus vectores son colineales (uno es múltiplo escalar del otro).
 
+Matemáticamente, si $\vec{v}' = k\vec{v}$ para algún escalar $k > 0$:
+\[
+\cos(\theta_{\vec{u},\vec{v}'}) = \frac{\vec{u} \cdot k\vec{v}}{\|\vec{u}\|\,\|k\vec{v}\|} = \frac{k(\vec{u}\cdot\vec{v})}{\|\vec{u}\|\cdot k\|\vec{v}\|} = \frac{\vec{u}\cdot\vec{v}}{\|\vec{u}\|\,\|\vec{v}\|} = \cos(\theta_{\vec{u},\vec{v}})
+\]
+
+Esto garantiza que la similitud coseno es \textbf{invariante ante la longitud del documento}, propiedad fundamental para comparar textos de distinta extensión con justicia.
+
+En el modelo Bag-of-Words, la comparación por similitud coseno sigue tres pasos:
+\begin{enumerate}
+    \item La consulta del usuario se preprocesa y vectoriza con el mismo vocabulario del corpus, generando un vector $\vec{q} \in \mathbb{R}^n$.
+    \item Se calcula $\cos(\theta_i) = \text{sim}(\vec{q}, \vec{d_i})$ para cada documento $\vec{d_i}$ del corpus.
+    \item Los documentos se ordenan de mayor a menor similitud y se retornan los más relevantes.
+\end{enumerate}
+
+\subsubsection{Interpretación geométrica}
+
+La interpretación geométrica de la similitud coseno se apoya en la noción de \textbf{dirección} en un espacio vectorial de alta dimensión. Aunque el espacio real de los documentos vive en $\mathbb{R}^{154}$ (una dimensión por término del vocabulario), los principios geométricos son los mismos que en $\mathbb{R}^2$ o $\mathbb{R}^3$.
+
+Cada vector de documento $\vec{d_i}$ define una \textbf{dirección} en el espacio: la orientación de la flecha que va desde el origen hasta el punto $(f_{i,1}, f_{i,2}, \ldots, f_{i,n})$. Dos documentos que hablan del mismo tema utilizarán términos similares, por lo que sus vectores tendrán valores no nulos en las mismas coordenadas: ambas flechas se dirigirán hacia la misma región del espacio, formando un ángulo $\theta$ pequeño. Dos documentos de temáticas distintas no comparten vocabulario; sus vectores tendrán valores no nulos en coordenadas disjuntas y formarán un ángulo próximo a $90°$.
+
+La clave de la similitud coseno es que \textbf{no importa la longitud de las flechas, sino solo su dirección}. Si se normalizan todos los vectores de documentos para que tengan norma 1 (proyectando los puntos sobre la superficie de una hiperesfera unitaria en $\mathbb{R}^n$), la similitud coseno entre dos vectores normalizados es simplemente su producto punto:
+\[
+\text{sim}(\hat{u}, \hat{v}) = \hat{u} \cdot \hat{v} = \cos(\theta)
+\]
+donde $\hat{u} = \vec{u}/\|\vec{u}\|$. Todos los documentos del corpus quedan así representados como \textbf{puntos en una hiperesfera unitaria}, y la similitud entre dos de ellos es proporcional a qué tan ``cerca'' están en esa superficie esférica. Esta propiedad es la que explota la optimización del mapa de calor implementada en \texttt{buscador.py}: la fórmula matricial $S = \hat{M}\hat{M}^T$ calcula todos los $12 \times 12$ cosenos simultáneamente.
+
+En términos concretos para este proyecto:
 \begin{itemize}
-    \item \textbf{Frase A:} ``la inteligencia artificial utiliza aprendizaje'' $\rightarrow \vec{a} = (1, 1, 1, 0)$
-    \item \textbf{Frase B:} ``el aprendizaje de datos e inteligencia'' $\rightarrow \vec{b} = (1, 0, 1, 1)$
+    \item Doc~1 (Inteligencia Artificial) y Doc~3 (Aprendizaje Automático) forman un ángulo de aproximadamente $76°$ ($\cos \approx 0.24$): sus vectores apuntan en direcciones similares porque ambos usan términos del dominio de la IA.
+    \item Doc~1 (Inteligencia Artificial) y Doc~12 (Robótica) son casi ortogonales ($\cos \approx 0.00$): sus vectores apuntan en direcciones perpendiculares porque no comparten vocabulario relevante.
+    \item La consulta ``inteligencia artificial aprendizaje'' genera un vector cuya dirección se ubica dentro del clúster de IA del espacio vectorial, lo que explica por qué el buscador recupera Doc~1, Doc~3 y Doc~11 como los más similares.
 \end{itemize}
 
-\paragraph{Paso 1 — Producto punto:}
+\subsubsection{Ejemplo matemático detallado}
+
+Para ilustrar el cálculo de forma concreta, consideremos dos frases breves representadas en un vocabulario simplificado de cuatro términos: \textbf{V} = \{``inteligencia'', ``artificial'', ``aprendizaje'', ``datos''\}.
+
+\begin{itemize}
+    \item \textbf{Frase A:} ``la inteligencia artificial utiliza aprendizaje'' \\
+    Conteos: \{inteligencia: 1, artificial: 1, aprendizaje: 1, datos: 0\} $\Rightarrow \vec{a} = (1,\, 1,\, 1,\, 0)$
+    \item \textbf{Frase B:} ``el aprendizaje de datos e inteligencia'' \\
+    Conteos: \{inteligencia: 1, artificial: 0, aprendizaje: 1, datos: 1\} $\Rightarrow \vec{b} = (1,\, 0,\, 1,\, 1)$
+\end{itemize}
+
+\paragraph{Paso 1 — Producto punto.}
+El producto punto mide cuánto ``se solapan'' las frecuencias de ambos documentos término a término:
 \[
-\vec{a} \cdot \vec{b} = (1)(1) + (1)(0) + (1)(1) + (0)(1) = 2
+\vec{a} \cdot \vec{b} = (1)(1) + (1)(0) + (1)(1) + (0)(1) = 1 + 0 + 1 + 0 = 2
+\]
+Los únicos términos que aportan al producto son ``inteligencia'' y ``aprendizaje'', que ambas frases comparten. ``Artificial'' está en A pero no en B, y ``datos'' está en B pero no en A, por lo que sus contribuciones son cero.
+
+\paragraph{Paso 2 — Normas euclidianas.}
+La norma captura la magnitud (longitud) de cada vector y sirve para normalizar:
+\[
+\|\vec{a}\| = \sqrt{1^2 + 1^2 + 1^2 + 0^2} = \sqrt{3} \approx 1.7321
+\]
+\[
+\|\vec{b}\| = \sqrt{1^2 + 0^2 + 1^2 + 1^2} = \sqrt{3} \approx 1.7321
+\]
+En este caso ambas frases tienen la misma norma porque poseen exactamente 3 términos con frecuencia 1. Esto es una coincidencia del ejemplo; en general los documentos tendrán normas diferentes.
+
+\paragraph{Paso 3 — Similitud coseno.}
+Aplicando la Ecuación~\ref{eq:coseno}:
+\[
+\cos(\theta) = \frac{\vec{a} \cdot \vec{b}}{\|\vec{a}\| \cdot \|\vec{b}\|} = \frac{2}{\sqrt{3} \cdot \sqrt{3}} = \frac{2}{3} \approx 0.6667
 \]
 
-\paragraph{Paso 2 — Normas:}
+\paragraph{Paso 4 — Recuperación del ángulo.}
+El ángulo real entre los dos vectores en $\mathbb{R}^4$ puede obtenerse como:
 \[
-\|\vec{a}\| = \sqrt{1^2 + 1^2 + 1^2 + 0^2} = \sqrt{3} \approx 1.732
+\theta = \arccos(0.6667) \approx 48.19°
 \]
-\[
-\|\vec{b}\| = \sqrt{1^2 + 0^2 + 1^2 + 1^2} = \sqrt{3} \approx 1.732
-\]
+Este ángulo confirma la interpretación geométrica: los vectores no son colineales ($\theta \neq 0°$) ni ortogonales ($\theta \neq 90°$), sino que forman un ángulo intermedio que refleja la existencia de vocabulario compartido parcial.
 
-\paragraph{Paso 3 — Similitud coseno:}
-\[
-\cos(\theta) = \frac{2}{\sqrt{3} \cdot \sqrt{3}} = \frac{2}{3} \approx 0.667
-\]
-
-\paragraph{Interpretación:} Una similitud de 0.667 indica que las frases comparten una proporción significativa de vocabulario (``inteligencia'' y ``aprendizaje''), lo que sugiere relación temática. La frase A incluye ``artificial'' (ausente en B) y la frase B incluye ``datos'' (ausente en A), lo que impide una similitud de 1.0.
+\paragraph{Interpretación del resultado.}
+Una similitud de $0.667$ indica una relación temática significativa entre las frases, justificada en que comparten 2 de los 3 términos informativos de cada una (``inteligencia'' y ``aprendizaje''). La presencia de ``artificial'' en A y ``datos'' en B, sin correspondencia en la otra frase, reduce la similitud respecto al máximo posible de 1.0. En el motor de búsqueda del proyecto, si la Frase B fuera una consulta del usuario y la Frase A un documento del corpus, el sistema la recuperaría como relevante con una puntuación de 0.667, situándola por encima de documentos sin vocabulario común (similitud 0) y por debajo de documentos que comparten los mismos 4 términos (similitud 1).

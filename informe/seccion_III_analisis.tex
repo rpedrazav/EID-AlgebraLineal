@@ -7,6 +7,44 @@
 % Renato se encarga del análisis empírico: III.A.2 en adelante y toda la sección III.B.
 % =============================================================================
 
+\section{Implementación Computacional}
+
+\subsection{Álgebra lineal y operaciones vectoriales para recuperación de información}
+
+El puente entre la teoría matemática expuesta en la Sección~\ref{sec:marco} y el sistema de búsqueda funcional reside en la traducción directa de tres operaciones del álgebra lineal en funciones computacionales. La recuperación de información basada en vectores no requiere estructuras de datos explícitamente ``inteligentes'': basta con representar los documentos y consultas como vectores en un espacio común, y definir una medida geométrica de semejanza entre ellos. Todo el poder semántico del buscador emerge de estas tres operaciones, implementadas en \texttt{src/similitud.py}:
+
+\begin{enumerate}
+    \item \textbf{Producto punto} (\texttt{calcular\_producto\_punto(u, v)}): calcula $\vec{u} \cdot \vec{v} = \sum_{i=1}^{n} u_i v_i$ mediante \texttt{numpy.dot()}, que ejecuta la operación en código compilado C con complejidad $O(n)$, significativamente más rápido que un bucle Python equivalente. Matemáticamente, el producto punto cuantifica cuánto ``se alinean'' dos vectores: cuando las componentes grandes de $\vec{u}$ coinciden con las componentes grandes de $\vec{v}$ (es decir, ambos documentos usan los mismos términos con frecuencia), el resultado es mayor. Si los documentos no comparten ningún término, el producto punto es cero.
+
+    \item \textbf{Norma euclidiana} (\texttt{calcular\_norma(vector)}): calcula $\|\vec{v}\| = \sqrt{\sum_{i=1}^{n} v_i^2}$ mediante \texttt{numpy.linalg.norm()}. La norma representa la longitud o magnitud del vector en el espacio $\mathbb{R}^n$. Su papel en la similitud coseno es el de \textbf{normalizador}: al dividir el producto punto por el producto de las normas, se cancela el efecto de la extensión de los documentos. Dos documentos sobre el mismo tema, donde uno sea el doble de largo que el otro, tendrán normas distintas pero su similitud coseno será cercana a~1.
+
+    \item \textbf{Similitud coseno} (\texttt{similitud\_coseno(u, v)}): aplica la Ecuación~\ref{eq:coseno}, combinando el producto punto y las normas para obtener el coseno del ángulo entre dos vectores. La implementación incorpora una tolerancia numérica $\varepsilon = 10^{-12}$ en el denominador para evitar la división por cero en el caso de que alguno de los vectores tenga norma nula, lo cual ocurre cuando un documento no contiene ningún término del vocabulario o cuando la consulta del usuario no coincide con ningún término indexado. En esos casos, la función retorna $0.0$ de forma controlada, sin propagar errores numéricos.
+\end{enumerate}
+
+La relación entre estas tres operaciones no es arbitraria: proviene directamente de la identidad del producto punto en términos del ángulo entre vectores ($\vec{u} \cdot \vec{v} = \|\vec{u}\|\|\vec{v}\|\cos\theta$), derivada del \textbf{teorema del coseno} de la geometría euclidiana extendido a $\mathbb{R}^n$. Así, el código en \texttt{similitud.py} no es una implementación ad hoc, sino la traducción fiel de un resultado del álgebra lineal a instrucciones computacionales.
+
+\subsubsection{Motor de búsqueda}
+
+La clase \texttt{BuscadorSemantico} (\texttt{src/buscador.py}) encapsula el proceso completo de recuperación de información en tres etapas que materializan la teoría vectorial:
+
+\begin{enumerate}
+    \item \textbf{Vectorización de la consulta} (\texttt{vectorizar\_consulta()}): el texto de búsqueda ingresado por el usuario pasa por el mismo pipeline de preprocesamiento aplicado al corpus (minuscúlas, limpieza, tokenización, remocción de stopwords) y se convierte en un vector $\vec{q} \in \mathbb{R}^{154}$ usando el vocabulario ya construido. Esta uniformidad es fundamental: tanto la consulta como los documentos viven en el mismo espacio vectorial, lo que hace que la similitud coseno entre ellos sea geométricamente válida. Los términos de la consulta que no existen en el vocabulario se ignoran, pues no tienen una dimensión asignada en el espacio.
+
+    \item \textbf{Cálculo de similitudes} (\texttt{buscar()}): se computa $\cos(\theta_i) = \text{sim}(\vec{q}, \vec{d_i})$ para cada una de las 12 filas $\vec{d_i}$ de la Matriz Documento-Término $M \in \mathbb{R}^{12 \times 154}$. La implementación aprovecha la \textbf{vectorización matricial} de NumPy: en lugar de calcular 12 productos punto en un bucle, se computan todos los productos punto simultáneamente mediante la multiplicación $M \cdot \vec{q}$, que resulta en un vector de 12 escalarés, uno por documento. Este enfoque reduce la cantidad de interpretaciones de bytecode Python y delega el cómputo masivo a rutinas BLAS altamente optimizadas.
+
+    \item \textbf{Ranking} (\texttt{buscar()}): los documentos se ordenan de mayor a menor similitud mediante \texttt{numpy.argsort()}, que retorna los índices en orden ascendente de similitud; al invertirlos se obtiene el ranking descendente. Se retornan los top-$k$ resultados (configurable, por defecto $k=5$).
+\end{enumerate}
+
+\subsubsection{Optimización: Matriz de similitud pre-computada}
+
+Para generar el mapa de calor entre todos los documentos (análisis de la Sección~\ref{sec:heatmap}), se implementó en \texttt{calcular\_matriz\_similitud()} un cálculo vectorizado de la matriz completa de similitudes mediante una única operación matricial:
+\[
+S = \hat{M} \cdot \hat{M}^T
+\]
+donde $\hat{M}$ es la Matriz Documento-Término con \textbf{filas normalizadas}: $\hat{\vec{d_i}} = \vec{d_i} / \|\vec{d_i}\|$. Cada elemento resultante $S_{ij} = \hat{\vec{d_i}} \cdot \hat{\vec{d_j}} = \cos(\theta_{ij})$ es la similitud coseno entre los documentos $i$ y $j$.
+
+Esta formulación es correcta porque, al normalizar las filas de $\hat{M}$, el producto punto entre dos filas cualesquiera ya incorpora la división por ambas normas implícitamente. El resultado es una matriz $S \in \mathbb{R}^{12 \times 12}$ simétrica (pues $\cos(\theta_{ij}) = \cos(\theta_{ji})$) con unos en la diagonal (cada documento es idéntico a sí mismo). Esta única multiplicación matricial calcula las $\binom{12}{2} = 66$ similitudes únicas en una sola operación, frente a 66 llamadas individuales a \texttt{similitud\_coseno()} que requeriría el enfoque ingenuo.
+
 % ─────────────────────────────────────────────────────────────────────────────
 % III.A.2 — Búsquedas experimentales y análisis de resultados
 % ─────────────────────────────────────────────────────────────────────────────
