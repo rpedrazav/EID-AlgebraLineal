@@ -1,7 +1,7 @@
 % =============================================================================
 % Informe — Buscador Semántico Simple utilizando Representación Vectorial
 % Curso: Álgebra Lineal para la Computación
-% Grupo 2: Rodrigo, Seba, Dani, Renato
+% Grupo 1: Rodrigo, Seba, Dani, Renato
 % =============================================================================
 \documentclass[12pt, a4paper]{article}
 
@@ -9,55 +9,52 @@
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}                    % Fuente Latin Modern
+\usepackage{lmodern}                    % Fuente Latin Modern
 \usepackage{geometry}
 \geometry{margin=2.5cm}
-\usepackage{graphicx}                   % Imágenes
-\usepackage{float}                      % Posicionamiento [H]
-\usepackage{amsmath, amssymb}           % Matemáticas
-\usepackage{booktabs}                   % Tablas profesionales
-\usepackage{multirow}                   % Celdas multi-fila
-\usepackage{hyperref}                   % Enlaces
-\usepackage{caption}                    % Captions mejorados
-\usepackage{enumitem}                   % Listas personalizables
-\usepackage{xcolor}                     % Colores
-\usepackage{listings}                   % Código fuente
-\usepackage{fancyhdr}                   % Encabezados
+\usepackage{graphicx}                   % Imágenes
+\usepackage{float}                      % Posicionamiento [H]
+\usepackage{amsmath, amssymb}           % Matemáticas
+\usepackage{booktabs}                   % Tablas profesionales
+\usepackage{multirow}                   % Celdas multi-fila
+\usepackage{hyperref}                   % Enlaces
+\usepackage{caption}                    % Captions mejorados
+\usepackage{enumitem}                   % Listas personalizables
+\usepackage{xcolor}                     % Colores
+\usepackage{listings}                   % Código fuente
+\usepackage{fancyhdr}                   % Encabezados
 
 % ─── Configuración de listings (código Python) ──────────────────────────────
 \lstset{
-    language=Python,
-    basicstyle=\ttfamily\small,
-    keywordstyle=\color{blue}\bfseries,
-    commentstyle=\color{gray}\itshape,
-    stringstyle=\color{red!70!black},
-    numbers=left,
-    numberstyle=\tiny\color{gray},
-    breaklines=true,
-    frame=single,
-    captionpos=b,
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{red!70!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    captionpos=b,
 }
 
 % ─── Configuración de hyperref ───────────────────────────────────────────────
 \hypersetup{
-    colorlinks=true,
-    linkcolor=blue!70!black,
-    urlcolor=blue!70!black,
-    citecolor=blue!70!black,
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    urlcolor=blue!70!black,
+    citecolor=blue!70!black,
 }
 
 % ─── Encabezados ─────────────────────────────────────────────────────────────
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\small Álgebra Lineal para la Computación}
-\fancyhead[R]{\small Grupo 2}
+\fancyhead[R]{\small Grupo 1}
 \fancyfoot[C]{\thepage}
 
 % =============================================================================
 \begin{document}
-
-% ─── Portada ─────────────────────────────────────────────────────────────────
-\begin{titlepage}
 \centering
 \vspace*{2cm}
 
@@ -68,10 +65,10 @@
 
 {\large\textbf{Integrantes:}}\\[0.3cm]
 \begin{tabular}{ll}
-    Rodrigo & — Integración y Project Manager \\
-    Seba    & — Preprocesamiento y Vectorización \\
-    Dani    & — Álgebra Lineal y Motor de Búsqueda \\
-    Renato  & — Análisis Experimental y Visualización \\
+    Rodrigo Pedraza & — Integración y Project Manager \\
+    Sebastian Pereda    & — Preprocesamiento y Vectorización \\
+    Daniel Prado    & — Álgebra Lineal y Motor de Búsqueda \\
+    Renato Carrasco  & — Análisis Experimental y Visualización \\
 \end{tabular}
 
 \vfill
@@ -80,6 +77,12 @@
 
 % ─── Tabla de contenidos ─────────────────────────────────────────────────────
 \tableofcontents
+\newpage
+
+% =============================================================================
+% Introducción
+% =============================================================================
+\input{introduccion}
 \newpage
 
 % =============================================================================
@@ -103,32 +106,25 @@
 % =============================================================================
 \section{Reflexión y Conclusiones}
 % Responsable: Rodri
-% Estado: Borrador inicial. Rodri debe revisar, personalizar y expandir.
+% Estado: Finalizado.
 
-\subsection{Evolución de los vectores en aplicaciones modernas}
+Este proyecto ha demostrado exitosamente cómo los principios fundamentales del álgebra lineal actúan como puente entre el lenguaje humano y el procesamiento computacional estructurado. Mediante la construcción de un espacio vectorial, fue posible transformar un corpus de texto no estructurado a una matriz matemática; de esta forma, la información se resuelve mediante cálculos geométricos.
 
-El modelo vectorial de recuperación de información, utilizado en este proyecto en su forma más básica (Bag-of-Words con frecuencia de términos), es el fundamento teórico sobre el que se construyen tecnologías modernas como:
+\subsection{Eficacia y limitaciones del modelo}
 
-\begin{itemize}
-    \item \textbf{Word2Vec y GloVe:} algoritmos que representan palabras como vectores densos en espacios de 100--300 dimensiones, capturando relaciones semánticas (ej. \textit{rey - hombre + mujer $\approx$ reina}).
-    \item \textbf{Transformers y Modelos de Lenguaje (GPT, BERT):} generan representaciones vectoriales contextuales donde el significado de una palabra depende de su entorno. Estos \textit{embeddings} se comparan usando la misma similitud coseno que nuestro buscador.
-    \item \textbf{Motores de búsqueda modernos (Google, Bing):} combinan búsqueda vectorial semántica con índices invertidos tradicionales para balancear precisión y velocidad.
-\end{itemize}
+La implementación del buscador semántico dejó en evidencia la eficacia de la similitud coseno como métrica de evaluación semántica. Al priorizar el ángulo entre los vectores $\vec{u}$ y $\vec{v}$ en lugar de su magnitud, mediante la expresión:
+\[
+\cos(\theta) = \frac{\vec{u} \cdot \vec{v}}{\|\vec{u}\| \|\vec{v}\|}
+\]
+el sistema logró reducir el sesgo introducido por las diferencias en la longitud de los documentos. Las pruebas, respaldadas por las visualizaciones de reducción dimensional (PCA) y los mapas de calor, confirmaron que el modelo es capaz de identificar correctamente clústeres temáticos y reunir información relevante basándose únicamente en la frecuencia del vocabulario compartido.
 
-\subsection{Limitaciones del buscador basado en TF}
+Sin embargo, el análisis también muestra las limitaciones del modelo de Bag-of-Words y la frecuencia de términos. La incapacidad de obtener el contexto semántico profundo, la ambigüedad léxica y la pérdida de sintaxis estructural limitan el alcance del algoritmo frente a corpus demasiado complejos.
 
-\begin{enumerate}
-    \item \textbf{No captura sinónimos:} ``automóvil'' y ``carro'' son vectores distintos, aunque significan lo mismo.
-    \item \textbf{No considera la importancia relativa de los términos:} un término que aparece en todos los documentos (alta frecuencia) recibe el mismo peso que uno específico. Esquemas como TF-IDF mitigan esto.
-    \item \textbf{Dimensionalidad fija:} el vocabulario se define una vez; documentos nuevos pueden contener términos desconocidos.
-    \item \textbf{Corpus pequeño:} con solo 12 documentos, las similitudes están limitadas por la cantidad de vocabulario compartido.
-\end{enumerate}
+\subsection{Evolución hacia aplicaciones modernas}
 
-\subsection{Conclusiones}
+No obstante, entender estas restricciones es el primer paso para poder lograr la adopción de sistemas de vanguardia. Este enfoque matemático fundamental es la base sobre la que operan las inteligencias artificiales. Tecnologías como Word2Vec, algoritmos de recomendación y arquitecturas Transformer (utilizadas por Modelos de Lenguaje Grande) resuelven las necesidades del conteo de palabras tradicional incorporando dimensionalidad semántica y pesos contextuales de forma geométrica. 
 
-El buscador semántico implementado demuestra exitosamente cómo las operaciones de álgebra lineal —producto punto, norma y similitud coseno— permiten transformar un problema lingüístico en uno matemático resoluble computacionalmente. A pesar de la simplicidad del modelo Bag-of-Words, el sistema recupera correctamente los documentos relevantes en 4 de las 5 consultas experimentales, con una identificación clara de clústeres temáticos en el análisis PCA.
-
-Las principales fortalezas del enfoque son su transparencia matemática, su eficiencia computacional y su fundamentación directa en conceptos de álgebra lineal. Sus limitaciones —ambigüedad léxica, insensibilidad al orden, incapacidad de captar sinónimos— motivan el estudio de modelos más avanzados como TF-IDF, embeddings densos y transformers.
+En conclusión, este proyecto logró implementar un motor de búsqueda funcional y, además, nos enseñó las bases matemáticas sobre las que opera la Inteligencia Artificial moderna.
 
 % =============================================================================
 % SECCIÓN V — Anexos
@@ -178,11 +174,10 @@ El código fuente completo se encuentra en el repositorio del proyecto, organiza
 
 \subsection{Bibliografía}
 \begin{itemize}
-    \item Manning, C. D., Raghavan, P., \& Schütze, H. (2008). \textit{Introduction to Information Retrieval}. Cambridge University Press.
-    \item Strang, G. (2016). \textit{Introduction to Linear Algebra} (5th ed.). Wellesley-Cambridge Press.
-    \item NumPy Documentation: \url{https://numpy.org/doc/}
-    \item scikit-learn PCA: \url{https://scikit-learn.org/stable/modules/decomposition.html#pca}
+    \item Manning, C. D., Raghavan, P., \& Schütze, H. (2008). \textit{Introduction to Information Retrieval}. Cambridge University Press.
+    \item Strang, G. (2016). \textit{Introduction to Linear Algebra} (5th ed.). Wellesley-Cambridge Press.
+    \item NumPy Documentation: \url{https://numpy.org/doc/}
+    \item scikit-learn PCA: \url{https://scikit-learn.org/stable/modules/decomposition.html#pca}
 \end{itemize}
 
 \end{document}
-
